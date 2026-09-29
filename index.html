@@ -161,6 +161,7 @@ kbd{font-family:var(--ui);font-size:0.6875rem;border:1px solid var(--line);borde
 
 /* deck picker */
 .deckbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.ctrls select{font-size:0.75rem;padding:4px 6px;border-radius:7px}
 select,input[type=search]{font:inherit;font-size:0.8438rem;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 input[type=search]{width:100%}
 select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:1px}
@@ -251,7 +252,8 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
     <div class="row1">
       <button class="logo" id="home" title="Back to the start (Home)" aria-label="Back to the start">Kanji for JLPT<small id="total"></small></button>
       <div class="tabs" role="tablist">
-        <button role="tab" id="t-study" aria-selected="true">Study</button>
+        <button role="tab" id="t-study" aria-selected="true">Kanji</button>
+        <button role="tab" id="t-vocab" aria-selected="false">Vocab</button>
         <button role="tab" id="t-browse" aria-selected="false">Browse</button>
       </div>
     </div>
@@ -269,6 +271,11 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
           <button data-v="on" aria-pressed="true">Show</button>
           <button data-v="off" aria-pressed="false">Hide</button>
         </div>
+      </div>
+      <div class="ctrl"><span>Level</span>
+        <select id="lvlSel" aria-label="Choose a level"><option value="all">All levels</option><option value="N2" selected>N2 only</option><option value="N3">N3 only</option>
+<option value="N4">N4 only</option>
+<option value="N5">N5 only</option><option value="N1*">N1 extras</option></select>
       </div>
       <div class="ctrl"><span>Words</span>
         <div class="seg" id="wl" aria-label="Vocabulary level">
@@ -300,9 +307,6 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
 <div class="wrap">
   <div id="study">
     <div class="deckbar">
-      <select id="lvlSel" aria-label="Choose a level"><option value="all">All levels</option><option value="N2" selected>N2 only</option><option value="N3">N3 only</option>
-<option value="N4">N4 only</option>
-<option value="N5">N5 only</option><option value="N1*">N1 extras</option></select>
       <select id="deckSel" aria-label="Choose a set"></select>
       <button class="chip" id="shuffle" aria-pressed="false">Shuffle</button>
       <button class="chip" id="weakOnly" aria-pressed="false">Needs work</button>
@@ -321,6 +325,23 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
       党員 and 党首 are ordinary Japanese, the lists simply don't carry them. About a third of the
       vocabulary here is unlisted in that way. Vocabulary-list data from
       <a href="https://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller</a> (CC BY).
+    </div>
+  </div>
+
+  <div id="vocab" hidden>
+    <div class="deckbar">
+      <select id="vdeckSel" aria-label="Choose a set"></select>
+      <button class="chip" id="vshuffle" aria-pressed="false">Shuffle</button>
+      <button class="chip" id="vweak" aria-pressed="false">Needs work</button>
+      <button class="chip" id="vlisted" aria-pressed="false" title="Only words that appear on a JLPT vocabulary list">On a list</button>
+    </div>
+    <div id="vstage"></div>
+    <p class="keys"><kbd>Space</kbd> flip · <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>←</kbd> <kbd>→</kbd> move · <kbd>F</kbd> furigana · <kbd>E</kbd> english</p>
+    <div class="note">
+      <b>The same words, the other way round.</b> These are the vocabulary already on the kanji
+      cards — you see the word, recall its reading and meaning, then check against the example
+      sentence. Progress here is kept separately from the kanji, so drilling a word doesn't mark
+      its kanji learned. The level menu and the <b>Words</b> filter both apply.
     </div>
   </div>
 
@@ -406,6 +427,7 @@ $('lvlSel').onchange = e => {
   level = e.target.value;
   try { localStorage.setItem('n2-level', level); } catch(err){}
   setIdx = 0; buildSets(); buildDeck();
+  vSetIdx = 0; if (typeof buildVDeck === 'function') buildVDeck();
   if (!$('browse').hidden) renderBrowse($('q').value);
 };
 
@@ -428,6 +450,13 @@ $('weakOnly').onclick = e => { weak = !weak; e.currentTarget.setAttribute('aria-
 const byK = Object.fromEntries(DATA.map(d => [d.k, d]));
 
 function updateStat(){
+  if (typeof view !== 'undefined' && view === 'vocab'){
+    const P = vpool();
+    const learned = P.filter(v => vbox(v.w) >= 3).length;
+    statEl.textContent = `${learned} / ${P.length} words`;
+    trackEl.style.width = (P.length ? learned / P.length * 100 : 0) + '%';
+    return;
+  }
   const P = pool();
   const learned = P.filter(d => box(d.k) >= 3).length;
   statEl.textContent = `${learned} / ${P.length} learned`;
@@ -602,16 +631,131 @@ function browseMark(ok){
 }
 $('q').addEventListener('input', e => renderBrowse(e.target.value));
 
-/* ---------- tabs ---------- */
-function show(view){
-  const s = view === 'study';
-  $('study').hidden = !s; $('browse').hidden = s;
-  $('t-study').setAttribute('aria-selected', String(s));
-  $('t-browse').setAttribute('aria-selected', String(!s));
-  if (!s) renderBrowse($('q').value);
+/* ---------- vocabulary deck ---------- */
+/* flatten the kanji cards into one word list; a word that sits on two kanji is kept once */
+const VOCAB = (() => {
+  const seen = new Map();
+  DATA.forEach(d => d.v.forEach((v, i) => {
+    if (seen.has(v[0])) return;
+    seen.set(v[0], {w:v[0], r:v[1], en:v[2], wl:v[3], k:d.k, x:d.x, s:d.s[i]});
+  }));
+  return [...seen.values()];
+})();
+const VKEY = w => 'w|' + w;                   /* keep word progress apart from kanji progress */
+const vbox = w => (prog[VKEY(w)] && prog[VKEY(w)].box) || 0;
+
+let vSets = [], vSetIdx = 0, vShuf = false, vWeak = false, vListed = false;
+let vorder = [], vpos = 0, vflip = false, vdone = false, vgood = 0, vagain = 0;
+
+function vpool(){
+  let P = VOCAB;
+  if (level !== 'all') P = P.filter(v => (LVN[v.x] || 'N2') === level);
+  if (vListed) P = P.filter(v => v.wl);
+  if (ROOT.getAttribute('data-wl') === 'hide') P = P.filter(v => !overLevel(v.wl));
+  return P;
 }
-$('t-study').onclick = () => show('study');
+function buildVSets(){
+  const M = vpool().length;
+  vSets = [{label:`All ${M} words`, from:0, to:M}];
+  for (let i = 0; i < M; i += 25) vSets.push({label:`${i+1} – ${Math.min(i+25,M)}`, from:i, to:Math.min(i+25,M)});
+  $('vdeckSel').innerHTML = vSets.map((s,i) => `<option value="${i}">${s.label}</option>`).join('');
+  if (vSetIdx >= vSets.length) vSetIdx = 0;
+  $('vdeckSel').value = vSetIdx;
+}
+function buildVDeck(){
+  buildVSets();
+  const s = vSets[vSetIdx] || vSets[0];
+  let list = vpool().slice(s.from, s.to);
+  if (vWeak) list = list.filter(v => vbox(v.w) < 3);
+  if (vShuf) for (let i = list.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [list[i],list[j]] = [list[j],list[i]]; }
+  vorder = list; vpos = 0; vflip = false; vdone = false; vgood = vagain = 0;
+  vrender();
+}
+$('vdeckSel').onchange = e => { vSetIdx = +e.target.value; buildVDeck(); };
+$('vshuffle').onclick = e => { vShuf = !vShuf; e.currentTarget.setAttribute('aria-pressed', vShuf); buildVDeck(); };
+$('vweak').onclick    = e => { vWeak = !vWeak; e.currentTarget.setAttribute('aria-pressed', vWeak); buildVDeck(); };
+$('vlisted').onclick  = e => { vListed = !vListed; e.currentTarget.setAttribute('aria-pressed', vListed); vSetIdx = 0; buildVDeck(); };
+
+function vrender(){
+  const st = $('vstage');
+  if (!vorder.length){ st.innerHTML = `<p class="empty">Nothing in this set.</p>`; updateStat(); return; }
+  if (vdone){
+    st.innerHTML = `
+      <div class="card"><div class="done">
+        <div class="mark">終</div><h2>Set finished</h2><p>${vorder.length} words reviewed.</p>
+        <div class="tally">
+          <div><b style="color:var(--moss)">${vgood}</b><span>Got it</span></div>
+          <div><b style="color:var(--persimmon)">${vagain}</b><span>Again</span></div>
+        </div>
+      </div></div>
+      <div class="foot"><button class="btn" id="vrestart">Go again</button></div>`;
+    $('vrestart').onclick = buildVDeck; updateStat(); return;
+  }
+  const v = vorder[vpos];
+  const lvchip = v.x ? ` <span class="lv ${v.x===1?'':'n'+v.x}">${v.x===1?'N1 extra':'N'+v.x}</span>` : '';
+  const wlchip = v.wl ? ` <span class="wl w${v.wl}">${WLN[v.wl]}</span>`
+                      : ` <span class="wl none" title="not on any JLPT vocabulary list">—</span>`;
+  updateStat();
+  if (!vflip){
+    st.innerHTML = `
+      <div class="card"><div class="face"><div class="prompt">
+        <div class="glyph" style="font-size:clamp(2.75rem,11vw,4.25rem)">${esc(v.w)}</div>
+        <p class="hint">from 「${esc(v.k)}」${lvchip}${wlchip} · recall the reading and the meaning</p>
+        <button class="reveal" id="vrev">Show reading</button>
+      </div></div></div>
+      <div class="nav"><button class="lnk" data-vgo="-1">← Previous</button><span class="lnk">${vpos+1} / ${vorder.length}</span><button class="lnk" data-vgo="1">Skip →</button></div>`;
+  } else {
+    st.innerHTML = `
+      <div class="card"><div class="face">
+        <div class="prompt" style="padding-block:6px 14px">
+          <div class="glyph" style="font-size:clamp(2.5rem,10vw,3.75rem)"><ruby>${esc(v.w)}<rt style="font-size:.38em">${esc(v.r)}</rt></ruby></div>
+          <p class="hint">from 「${esc(v.k)}」${lvchip}${wlchip}</p>
+        </div>
+        <p class="gloss" style="text-align:center;font-size:1rem">${esc(v.en)}</p>
+        <div class="sec"><h2>In a sentence <em>例文</em></h2>
+          <ol class="sents"><li><div class="jp">${rubyRuns(v.s[0])}</div><div class="en">${esc(v.s[1])}</div></li></ol>
+        </div>
+      </div></div>
+      <div class="foot"><button class="btn again" data-vmark="0">Again</button><button class="btn good" data-vmark="1">Got it</button></div>
+      <div class="nav"><button class="lnk" data-vgo="-1">← Previous</button><span class="lnk">${vpos+1} / ${vorder.length}</span><button class="lnk" data-vgo="1">Next →</button></div>`;
+  }
+  const r = $('vrev'); if (r) r.onclick = () => { vflip = true; vrender(); };
+  st.querySelectorAll('[data-vgo]').forEach(b => b.onclick = () => vmove(+b.dataset.vgo));
+  st.querySelectorAll('[data-vmark]').forEach(b => b.onclick = () => vmark(+b.dataset.vmark));
+  hookRuby(st);
+}
+function vmove(d){
+  const n = vpos + d;
+  if (n < 0) return;
+  if (n >= vorder.length){ vdone = true; return vrender(); }
+  vpos = n; vflip = false; vrender();
+}
+function vmark(ok){
+  const key = VKEY(vorder[vpos].w);
+  const p = prog[key] || (prog[key] = {box:0, seen:0});
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0;
+  if (ok) vgood++; else vagain++;
+  save(); vmove(1);
+}
+
+/* ---------- tabs ---------- */
+const VIEWS = ['study','vocab','browse'];
+let view = 'study';
+function show(v){
+  view = v;
+  VIEWS.forEach(x => { $(x).hidden = x !== v; $('t-'+x).setAttribute('aria-selected', String(x === v)); });
+  if (v === 'browse') renderBrowse($('q').value);
+  if (v === 'vocab' && !vorder.length) buildVDeck();
+  updateStat();
+}
+$('t-study').onclick  = () => show('study');
+$('t-vocab').onclick  = () => show('vocab');
 $('t-browse').onclick = () => show('browse');
+
+/* the Words filter changes which words are in the vocabulary deck, so rebuild it */
+$('wl').addEventListener('click', () => {
+  if (vorder.length){ vSetIdx = 0; buildVDeck(); }
+});
 
 /* ---------- home / back to top ---------- */
 function goHome(){
@@ -635,6 +779,14 @@ document.addEventListener('keydown', e => {
   if (k === 'f'){ cycleFuri(); return; }
   if (k === 'e'){ toggleTrans(); return; }
   if (k === 't'){ cycleTheme(); return; }
+  if (view === 'vocab'){
+    if (e.code === 'Space'){ e.preventDefault(); if (!vflip && !vdone){ vflip = true; vrender(); } }
+    else if (k === '1' && vflip && !vdone) vmark(0);
+    else if (k === '2' && vflip && !vdone) vmark(1);
+    else if (e.key === 'ArrowRight') vmove(1);
+    else if (e.key === 'ArrowLeft') vmove(-1);
+    return;
+  }
   if ($('study').hidden){          /* browse mode */
     if (browseK){
       if (k === '1'){ browseMark(0); return; }

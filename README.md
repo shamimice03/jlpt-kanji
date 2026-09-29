@@ -29,6 +29,10 @@ Each kanji has:
 
 - **Study** — spaced-repetition flashcards (Leitner boxes 0–5, learned at box 3),
   in sets of 25, filterable by level, shufflable, with a "Needs work" filter.
+- **Vocab** — the same 4,580 distinct words drilled the other way round: you see the word,
+  recall its reading and meaning, then check against its example sentence. Its own Leitner
+  progress, kept apart from the kanji, plus an **On a list** filter for words that appear on
+  a JLPT vocabulary list.
 - **Browse** — a grid of every kanji with search across kanji, readings, meanings,
   vocabulary and sentences; open any card to grade it *Again* / *Got it*, the same
   progress the Study tab uses.
