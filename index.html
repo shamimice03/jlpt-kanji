@@ -1,7 +1,23 @@
-<title>N2 漢字デッキ</title>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kanji for JLPT</title>
+<meta name="description" content="Flashcards for 1,042 JLPT kanji (N5-N1) with katakana onyomi, hiragana kunyomi, 5,217 vocabulary words and example sentences with furigana. Verified against KANJIDIC2, JMdict and Kanji alive.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#EDF0F4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kanji">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kanji for JLPT">
+<meta property="og:description" content="Flashcards for 1,042 JLPT kanji (N5-N1) with katakana onyomi, hiragana kunyomi, 5,217 vocabulary words and example sentences with furigana. Verified against KANJIDIC2, JMdict and Kanji alive.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231E4E79'/%3E%3Ctext x='32' y='46' font-size='42' text-anchor='middle' fill='%23fff' font-family='serif'%3E漢%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+</head>
+<body>
 <style>
 :root{
   --paper:#EDF0F4; --surface:#FFFFFF; --surface-2:#F5F8FB; --surface-3:#E8EDF3;
@@ -33,66 +49,79 @@
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+
+/* ---- type scale: everything is rem, so one root size drives the whole page ---- */
+:root{font-size:100%; --colw:720px}
+/* auto-scale up on larger displays */
+@media (min-width:1000px){:root{font-size:106.25%; --colw:820px}}
+@media (min-width:1360px){:root{font-size:112.5%;  --colw:900px}}
+@media (min-width:1700px){:root{font-size:118.75%; --colw:980px}}
+/* manual override from the Text control (wins over the media queries) */
+:root[data-size="s"] {font-size:93.75%  !important}
+:root[data-size="m"] {font-size:106.25% !important}
+:root[data-size="l"] {font-size:118.75% !important}
+:root[data-size="xl"]{font-size:131.25% !important}
+
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:0.9375rem;line-height:1.55;-webkit-font-smoothing:antialiased;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+.wrap{max-width:var(--colw);margin:0 auto;padding-inline:16px;padding-block:0 48px}
 
 /* header */
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft)}
-.bar-in{max-width:720px;margin:0 auto;padding:9px 16px}
+.bar-in{max-width:var(--colw);margin:0 auto;padding:9px 16px}
 .row1{display:flex;align-items:center;gap:12px}
-.logo{font-family:var(--mincho);font-weight:700;font-size:18px;white-space:nowrap}
-.logo small{font-family:var(--ui);font-weight:400;font-size:11px;color:var(--faint);letter-spacing:.07em;margin-left:6px}
+.logo{font-family:var(--mincho);font-weight:700;font-size:1.125rem;white-space:nowrap}
+.logo small{font-family:var(--ui);font-weight:400;font-size:0.6875rem;color:var(--faint);letter-spacing:.07em;margin-left:6px}
 .tabs{display:flex;gap:2px;margin-left:auto;background:var(--surface-3);border-radius:8px;padding:2px}
-.tabs button{font:inherit;font-size:13px;font-weight:500;padding:5px 13px;border:0;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.tabs button{font:inherit;font-size:0.8125rem;font-weight:500;padding:5px 13px;border:0;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .track{height:3px;background:var(--line-soft);border-radius:2px;margin-top:9px;overflow:hidden}
 .track i{display:block;height:100%;width:0;background:var(--indigo);transition:width .3s ease}
 .ctrls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:9px}
 .ctrl{display:flex;align-items:center;gap:6px}
-.ctrl>span{font-size:10.5px;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.ctrl>span{font-size:0.6562rem;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
 .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--surface)}
-.seg button{font:inherit;font-size:12px;padding:3px 9px;border:0;cursor:pointer;background:transparent;color:var(--muted);border-right:1px solid var(--line-soft)}
+.seg button{font:inherit;font-size:0.75rem;padding:3px 9px;border:0;cursor:pointer;background:transparent;color:var(--muted);border-right:1px solid var(--line-soft)}
 .seg button:last-child{border-right:0}
 .seg button[aria-pressed="true"]{background:var(--indigo);color:var(--indigo-ink);font-weight:600}
 .seg button:focus-visible{outline:2px solid var(--persimmon);outline-offset:-2px}
-.stat{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat{margin-left:auto;font-size:0.75rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 
 /* card */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin-top:18px;overflow:hidden}
 .face{padding:24px 22px}
 .prompt{display:flex;flex-direction:column;align-items:center;gap:14px;padding-block:20px}
-.glyph{font-family:var(--mincho);font-weight:500;line-height:1;font-size:clamp(84px,25vw,128px)}
-.glyph-sm{font-family:var(--mincho);font-size:44px;line-height:1;font-weight:500}
-.hint{font-size:13px;color:var(--faint);text-align:center}
-.lv{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;padding:1px 5px;border-radius:4px;background:var(--persimmon);color:#fff;vertical-align:2px;margin-left:5px}
+.glyph{font-family:var(--mincho);font-weight:500;line-height:1;font-size:clamp(5.25rem,25vw,8rem)}
+.glyph-sm{font-family:var(--mincho);font-size:2.75rem;line-height:1;font-weight:500}
+.hint{font-size:0.8125rem;color:var(--faint);text-align:center}
+.lv{display:inline-block;font-size:0.625rem;font-weight:700;letter-spacing:.06em;padding:1px 5px;border-radius:4px;background:var(--persimmon);color:#fff;vertical-align:2px;margin-left:5px}
 .lv.n3{background:var(--moss)}
 .lv.n4{background:#7B61A8}
 .lv.n5{background:#3F7F8C}
-.tile em{position:absolute;left:4px;bottom:3px;font-style:normal;font-size:8.5px;color:var(--persimmon);font-weight:700}
+.tile em{position:absolute;left:4px;bottom:3px;font-style:normal;font-size:0.5312rem;color:var(--persimmon);font-weight:700}
 .tile em.n3{color:var(--moss)}
 .tile em.n4{color:#7B61A8}
 .tile em.n5{color:#3F7F8C}
-.reveal{font:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:9px 26px;border-radius:999px;border:1px solid var(--indigo);background:var(--indigo);color:var(--indigo-ink)}
+.reveal{font:inherit;font-size:0.875rem;font-weight:600;cursor:pointer;padding:9px 26px;border-radius:999px;border:1px solid var(--indigo);background:var(--indigo);color:var(--indigo-ink)}
 .reveal:focus-visible{outline:2px solid var(--persimmon);outline-offset:2px}
 .head{display:flex;align-items:center;gap:16px;padding-bottom:15px;border-bottom:1px solid var(--line-soft)}
 .readings{display:flex;flex-direction:column;gap:5px;min-width:0}
 .rd{display:flex;gap:9px;align-items:baseline}
-.rd b{font-family:var(--jp);font-size:11px;font-weight:700;color:var(--indigo-ink);background:var(--indigo);border-radius:4px;padding:1px 5px;flex:none}
+.rd b{font-family:var(--jp);font-size:0.6875rem;font-weight:700;color:var(--indigo-ink);background:var(--indigo);border-radius:4px;padding:1px 5px;flex:none}
 .rd b.kun{background:var(--persimmon);color:#fff}
-.rd span{font-family:var(--jp);font-size:16px;word-break:break-all}
-.gloss{margin-top:9px;font-size:14px;color:var(--muted)}
+.rd span{font-family:var(--jp);font-size:1rem;word-break:break-all}
+.gloss{margin-top:9px;font-size:0.875rem;color:var(--muted)}
 .sec{margin-top:18px}
-.sec>h2{margin:0 0 9px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600}
-.sec>h2 em{font-style:normal;font-family:var(--jp);letter-spacing:.02em;text-transform:none;font-size:12px}
+.sec>h2{margin:0 0 9px;font-size:0.6562rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.sec>h2 em{font-style:normal;font-family:var(--jp);letter-spacing:.02em;text-transform:none;font-size:0.75rem}
 ul.vocab{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
 ul.vocab li{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:7px 10px;border-radius:7px;background:var(--surface-2)}
-ul.vocab .w{font-family:var(--jp);font-size:17px;font-weight:500}
-ul.vocab .en{font-size:13px;color:var(--muted);margin-left:auto;text-align:right}
+ul.vocab .w{font-family:var(--jp);font-size:1.0625rem;font-weight:500}
+ul.vocab .en{font-size:0.8125rem;color:var(--muted);margin-left:auto;text-align:right}
 ol.sents{list-style:none;margin:0;padding:0;counter-reset:s;display:flex;flex-direction:column;gap:11px}
 ol.sents li{counter-increment:s;padding-left:25px;position:relative}
-ol.sents li::before{content:counter(s);position:absolute;left:0;top:4px;font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums;width:17px;height:17px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;line-height:1}
-.jp{font-family:var(--jp);font-size:17px;line-height:2.05}
-.en{font-size:13.5px;color:var(--muted);margin-top:2px}
+ol.sents li::before{content:counter(s);position:absolute;left:0;top:4px;font-size:0.6562rem;color:var(--faint);font-variant-numeric:tabular-nums;width:17px;height:17px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;line-height:1}
+.jp{font-family:var(--jp);font-size:1.0625rem;line-height:2.05}
+.en{font-size:0.8438rem;color:var(--muted);margin-top:2px}
 
 /* furigana */
 ruby{ruby-position:over;-webkit-ruby-position:before}
@@ -105,55 +134,98 @@ rt{font-family:var(--jp);font-size:.52em;font-weight:400;color:var(--indigo);tra
 
 /* footer buttons */
 .foot{display:flex;gap:10px;margin-top:16px}
-.btn{font:inherit;font-size:14px;font-weight:600;cursor:pointer;flex:1;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn{font:inherit;font-size:0.875rem;font-weight:600;cursor:pointer;flex:1;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 .btn.again{border-color:color-mix(in srgb,var(--persimmon) 45%,var(--line));color:var(--persimmon)}
 .btn.good{border-color:color-mix(in srgb,var(--moss) 45%,var(--line));color:var(--moss)}
 .btn:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 .nav{display:flex;justify-content:space-between;margin-top:10px}
-.lnk{font:inherit;font-size:13px;background:none;border:0;cursor:pointer;color:var(--muted);padding:6px 4px}
+.lnk{font:inherit;font-size:0.8125rem;background:none;border:0;cursor:pointer;color:var(--muted);padding:6px 4px}
 .lnk:hover{color:var(--indigo)}
 .lnk:focus-visible{outline:2px solid var(--indigo);outline-offset:2px;border-radius:4px}
-.keys{margin-top:16px;font-size:12px;color:var(--faint);text-align:center;line-height:1.9}
-kbd{font-family:var(--ui);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--muted);background:var(--surface)}
+.keys{margin-top:16px;font-size:0.75rem;color:var(--faint);text-align:center;line-height:1.9}
+kbd{font-family:var(--ui);font-size:0.6875rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--muted);background:var(--surface)}
 
 /* deck picker */
 .deckbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px}
-select,input[type=search]{font:inherit;font-size:13.5px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+select,input[type=search]{font:inherit;font-size:0.8438rem;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 input[type=search]{width:100%}
 select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:1px}
-.chip{font:inherit;font-size:12.5px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.chip{font:inherit;font-size:0.7812rem;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--indigo);color:var(--indigo-ink);border-color:var(--indigo);font-weight:600}
 
 /* browse grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:7px;margin-top:14px}
-.tile{position:relative;aspect-ratio:1;display:grid;place-items:center;font-family:var(--mincho);font-size:26px;background:var(--surface);border:1px solid var(--line);border-radius:9px;cursor:pointer;color:var(--ink);padding:0}
+.tile{position:relative;aspect-ratio:1;display:grid;place-items:center;font-family:var(--mincho);font-size:1.625rem;background:var(--surface);border:1px solid var(--line);border-radius:9px;cursor:pointer;color:var(--ink);padding:0}
 .tile:hover{border-color:var(--indigo)}
 .tile:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 .tile i{position:absolute;right:4px;top:4px;width:6px;height:6px;border-radius:50%}
 .tile i.b1{background:var(--persimmon)}
 .tile i.b2{background:#D9A441}
 .tile i.b3{background:var(--moss)}
-.empty{margin-top:24px;text-align:center;color:var(--faint);font-size:14px}
+.empty{margin-top:24px;text-align:center;color:var(--faint);font-size:0.875rem}
 
 /* misc */
-.note{margin-top:20px;padding:12px 14px;border-radius:10px;background:var(--indigo-soft);color:var(--muted);font-size:12.5px;line-height:1.65}
+.note{margin-top:20px;padding:12px 14px;border-radius:10px;background:var(--indigo-soft);color:var(--muted);font-size:0.7812rem;line-height:1.65}
 .note b{color:var(--ink)}
 .done{text-align:center;padding:32px 20px}
-.done .mark{font-family:var(--mincho);font-size:54px;color:var(--moss);line-height:1}
-.done h2{margin:12px 0 6px;font-family:var(--mincho);font-size:22px}
-.done p{margin:0;color:var(--muted);font-size:14px}
+.done .mark{font-family:var(--mincho);font-size:3.375rem;color:var(--moss);line-height:1}
+.done h2{margin:12px 0 6px;font-family:var(--mincho);font-size:1.375rem}
+.done p{margin:0;color:var(--muted);font-size:0.875rem}
 .tally{display:flex;gap:26px;justify-content:center;margin-top:18px}
 .tally div{display:flex;flex-direction:column;gap:2px}
-.tally b{font-size:26px;font-variant-numeric:tabular-nums;font-weight:600}
-.tally span{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.tally b{font-size:1.625rem;font-variant-numeric:tabular-nums;font-weight:600}
+.tally span{font-size:0.6562rem;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+/* browse-detail grading */
+.bstate{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:0.8125rem;color:var(--muted)}
+.bstate .pill{font-size:0.6875rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--faint)}
+.bstate .pill.learned{background:color-mix(in srgb,var(--moss) 14%,transparent);border-color:color-mix(in srgb,var(--moss) 45%,var(--line));color:var(--moss)}
+.bstate .pill.seen{background:color-mix(in srgb,#D9A441 16%,transparent);border-color:color-mix(in srgb,#D9A441 50%,var(--line));color:#946A10}
+:root[data-theme="dark"] .bstate .pill.seen,
+:root:not([data-theme="light"]) .bstate .pill.seen{color:#D9A441}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-@media (max-width:420px){.face{padding:20px 15px}ul.vocab .en{margin-left:0;width:100%;text-align:left}.logo small{display:none}}
+
+/* ---------- responsive ---------- */
+/* tablet / small laptop: give the grid bigger touch targets */
+@media (min-width:640px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:9px}
+  .face{padding:28px 26px}
+}
+@media (min-width:1000px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:10px}
+  .face{padding:30px 30px}
+  .card{margin-top:22px}
+}
+/* phones */
+@media (max-width:560px){
+  .bar-in{padding:8px 14px}
+  .wrap{padding-inline:14px}
+  .ctrls{gap:9px 10px}
+  .ctrl>span{display:none}
+  .stat{margin-left:auto;font-size:0.6875rem}
+  .head{gap:12px}
+  .keys{display:none}
+}
+@media (max-width:420px){
+  .face{padding:20px 15px}
+  ul.vocab .en{margin-left:0;width:100%;text-align:left}
+  .logo small{display:none}
+  .logo{font-size:1rem}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px}
+  .foot{gap:8px}
+  .btn{padding:12px 8px}
+}
+/* very narrow: let the controls stack without squashing the tabs */
+@media (max-width:360px){
+  .row1{gap:8px}
+  .tabs button{padding:5px 10px}
+}
 </style>
 
 <div class="bar">
   <div class="bar-in">
     <div class="row1">
-      <span class="logo">N2 漢字<small id="total"></small></span>
+      <span class="logo">Kanji for JLPT<small id="total"></small></span>
       <div class="tabs" role="tablist">
         <button role="tab" id="t-study" aria-selected="true">Study</button>
         <button role="tab" id="t-browse" aria-selected="false">Browse</button>
@@ -174,6 +246,22 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
           <button data-v="off" aria-pressed="false">Hide</button>
         </div>
       </div>
+      <div class="ctrl"><span>Text</span>
+        <div class="seg" id="size" aria-label="Text size">
+          <button data-v="auto" aria-pressed="true" title="Match the screen">Auto</button>
+          <button data-v="s" aria-pressed="false" title="Small">S</button>
+          <button data-v="m" aria-pressed="false" title="Medium">M</button>
+          <button data-v="l" aria-pressed="false" title="Large">L</button>
+          <button data-v="xl" aria-pressed="false" title="Extra large">XL</button>
+        </div>
+      </div>
+      <div class="ctrl"><span>Theme</span>
+        <div class="seg" id="theme" aria-label="Colour theme">
+          <button data-v="auto" aria-pressed="true" title="Follow the system">Auto</button>
+          <button data-v="light" aria-pressed="false" title="Light">☀</button>
+          <button data-v="dark" aria-pressed="false" title="Dark">☾</button>
+        </div>
+      </div>
       <span class="stat" id="stat"></span>
     </div>
   </div>
@@ -190,17 +278,19 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
       <button class="chip" id="weakOnly" aria-pressed="false">Needs work</button>
     </div>
     <div id="stage"></div>
-    <p class="keys"><kbd>Space</kbd> flip · <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>←</kbd> <kbd>→</kbd> move · <kbd>F</kbd> furigana · <kbd>E</kbd> english</p>
+    <p class="keys"><kbd>Space</kbd> flip · <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>←</kbd> <kbd>→</kbd> move · <kbd>F</kbd> furigana · <kbd>E</kbd> english · <kbd>T</kbd> theme</p>
     <div class="note">
-      <b>Checked against the dictionaries.</b> Every reading and meaning was verified against KANJIDIC2,
-      and all 1,877 vocabulary words against JMdict. Sentence furigana is generated with the UniDic
-      analyser and overridden with the verified vocabulary readings. Progress is saved in this browser.
+      <b>Checked against the dictionaries.</b> Every reading and meaning was verified against KANJIDIC2
+      and cross-checked with Kanji alive; all 5,217 vocabulary words were verified against JMdict.
+      Sentence furigana is generated with the UniDic analyser and overridden with the verified vocabulary
+      readings. Progress is saved in this browser only — nothing is uploaded anywhere.
     </div>
   </div>
 
   <div id="browse" hidden>
     <div class="deckbar"><input type="search" id="q" placeholder="Search kanji, reading, meaning or English…" autocomplete="off"></div>
     <div id="results"></div>
+    <p class="keys">Open any kanji to mark it <b>Got it</b> or <b>Again</b> — the same progress the Study tab uses. <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>→</kbd> next · <kbd>Esc</kbd> back</p>
   </div>
 </div>
 
@@ -221,20 +311,40 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prog)); } ca
 const box = k => (prog[k] && prog[k].box) || 0;
 
 /* ---------- settings ---------- */
-function setSeg(id, val, attr){
-  [...$(id).children].forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === val)));
-  document.documentElement.setAttribute(attr, val);
+const ROOT = document.documentElement;
+const SEGS = {furi:{attr:'data-furi', def:'on'}, trans:{attr:'data-trans', def:'on'},
+              size:{attr:'data-size', def:'auto'}, theme:{attr:'data-theme', def:'auto'}};
+
+function setSeg(id, val){
+  const {attr, def} = SEGS[id];
+  const el = $(id); if (!el) return;
+  if (![...el.children].some(b => b.dataset.v === val)) val = def;
+  [...el.children].forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === val)));
+  if (val === 'auto') ROOT.removeAttribute(attr); else ROOT.setAttribute(attr, val);
   try { localStorage.setItem('n2-' + id, val); } catch(e){}
+  if (id === 'theme') paintChrome();
 }
-['furi','trans'].forEach(id => {
-  const attr = id === 'furi' ? 'data-furi' : 'data-trans';
-  let v = 'on';
-  try { v = localStorage.getItem('n2-' + id) || 'on'; } catch(e){}
-  setSeg(id, v, attr);
-  $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSeg(id, b.dataset.v, attr); });
+/* keep the mobile browser chrome in step with the theme */
+function paintChrome(){
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (!m) return;
+  requestAnimationFrame(() => {
+    m.setAttribute('content', getComputedStyle(ROOT).getPropertyValue('--paper').trim() || '#EDF0F4');
+  });
+}
+Object.keys(SEGS).forEach(id => {
+  let v = SEGS[id].def;
+  try { v = localStorage.getItem('n2-' + id) || v; } catch(e){}
+  setSeg(id, v);
+  $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSeg(id, b.dataset.v); });
 });
-const cycleFuri = () => setSeg('furi', {on:'hover',hover:'off',off:'on'}[document.documentElement.getAttribute('data-furi')], 'data-furi');
-const toggleTrans = () => setSeg('trans', document.documentElement.getAttribute('data-trans') === 'on' ? 'off' : 'on', 'data-trans');
+if (window.matchMedia) try {
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintChrome);
+} catch(e){}
+
+const cycleFuri  = () => setSeg('furi', {on:'hover',hover:'off',off:'on'}[ROOT.getAttribute('data-furi')] || 'hover');
+const toggleTrans = () => setSeg('trans', ROOT.getAttribute('data-trans') === 'on' ? 'off' : 'on');
+const cycleTheme = () => setSeg('theme', {auto:'light',light:'dark',dark:'auto'}[ROOT.getAttribute('data-theme') || 'auto']);
 
 /* ---------- deck sets ---------- */
 const N = DATA.length;
@@ -363,8 +473,19 @@ function mark(ok){
 }
 
 /* ---------- browse ---------- */
+function browseList(){
+  const t = (($('q') && $('q').value) || '').trim().toLowerCase();
+  if (!t) return pool();
+  return pool().filter(d =>
+    d.k === t || d.k.includes(t) ||
+    (d.o || '').toLowerCase().includes(t) || (d.u || '').toLowerCase().includes(t) ||
+    (d.m || '').toLowerCase().includes(t) ||
+    d.v.some(v => v[0].includes(t) || v[1].includes(t) || v[2].toLowerCase().includes(t)) ||
+    d.s.some(s => s[1].toLowerCase().includes(t) || plain(s[0]).includes(t)));
+}
 function renderBrowse(term){
   const t = (term || '').trim().toLowerCase();
+  browseK = null;
   let list = pool();
   if (t){
     list = pool().filter(d =>
@@ -382,18 +503,44 @@ function renderBrowse(term){
   }).join('') + `</div>`;
   $('results').querySelectorAll('.tile').forEach(b => b.onclick = () => openDetail(b.dataset.k));
 }
+function stateLine(k){
+  const b = box(k), seen = (prog[k] && prog[k].seen) || 0;
+  const pill = b >= 3 ? `<span class="pill learned">Learned</span>`
+             : seen    ? `<span class="pill seen">Box ${b} of 5</span>`
+                       : `<span class="pill">Not studied</span>`;
+  return `<div class="bstate">${pill}<span>${seen ? seen + (seen === 1 ? ' review' : ' reviews') : 'no reviews yet'}</span></div>`;
+}
+let browseK = null;
 function openDetail(k){
   const c = byK[k];
+  browseK = k;
   $('results').innerHTML = `
-    <div class="nav"><button class="lnk" id="back">← All kanji</button></div>
+    <div class="nav"><button class="lnk" id="back">← All kanji</button><button class="lnk" id="bnext">Next kanji →</button></div>
     <div class="card"><div class="face">
-      <div class="prompt" style="padding-block:6px 14px"><div class="glyph" style="font-size:clamp(70px,20vw,104px)">${esc(c.k)}</div>
+      <div class="prompt" style="padding-block:6px 14px"><div class="glyph" style="font-size:clamp(4.375rem,20vw,6.5rem)">${esc(c.k)}</div>
       <p class="hint">#${c.n}${c.x?` <span class="lv ${c.x===1?'':'n'+c.x}">${c.x===1?'N1 extra':'N'+c.x}</span>`:''}</p></div>
       ${detail(c, false)}
-    </div></div>`;
+      <div id="bst">${stateLine(k)}</div>
+    </div></div>
+    <div class="foot"><button class="btn again" id="bagain">Again</button><button class="btn good" id="bgood">Got it</button></div>`;
   $('back').onclick = () => { renderBrowse($('q').value); };
+  $('bnext').onclick = () => {
+    const list = browseList();
+    const i = list.findIndex(d => d.k === browseK);
+    if (i > -1 && i + 1 < list.length) openDetail(list[i+1].k);
+  };
+  $('bagain').onclick = () => browseMark(0);
+  $('bgood').onclick  = () => browseMark(1);
   hookRuby($('results'));
   window.scrollTo({top:0, behavior:'smooth'});
+}
+function browseMark(ok){
+  const p = prog[browseK] || (prog[browseK] = {box:0, seen:0});
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0;
+  save(); updateStat();
+  const el = $('bst'); if (el) el.innerHTML = stateLine(browseK);
+  /* if this card is in the deck being studied, keep that view honest too */
+  if (!$('study').hidden) render();
 }
 $('q').addEventListener('input', e => renderBrowse(e.target.value));
 
@@ -411,17 +558,29 @@ $('t-browse').onclick = () => show('browse');
 /* ---------- keys ---------- */
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,textarea,select')) return;
-  if ($('study').hidden) return;
   const k = e.key.toLowerCase();
+  if (k === 'f'){ cycleFuri(); return; }
+  if (k === 'e'){ toggleTrans(); return; }
+  if (k === 't'){ cycleTheme(); return; }
+  if ($('study').hidden){          /* browse mode */
+    if (browseK){
+      if (k === '1'){ browseMark(0); return; }
+      if (k === '2'){ browseMark(1); return; }
+      if (e.key === 'Escape'){ renderBrowse($('q').value); return; }
+      if (e.key === 'ArrowRight'){ const b = $('bnext'); if (b) b.click(); return; }
+    }
+    return;
+  }
   if (e.code === 'Space'){ e.preventDefault(); if (!flipped && !finished){ flipped = true; render(); } }
   else if (k === '1' && flipped && !finished) mark(0);
   else if (k === '2' && flipped && !finished) mark(1);
   else if (e.key === 'ArrowRight') move(1);
   else if (e.key === 'ArrowLeft') move(-1);
-  else if (k === 'f') cycleFuri();
-  else if (k === 'e') toggleTrans();
 });
 
 buildSets();
 buildDeck();
 </script>
+
+</body>
+</html>
