@@ -48,11 +48,24 @@ Each kanji has:
   studying, along with their sentences. A dashed **—** badge means the word is on no
   JLPT vocabulary list at all — about a third of the vocabulary here, which is normal:
   党員 and 党首 are ordinary Japanese that the lists happen not to carry.
-- The title doubles as a **Home** button, and a floating **↑** returns you to the top of
-  a long card.
+- A **Home** button in the header (the title works too), and a floating **↑** to return to
+  the top of a long card.
 - Keyboard: `Space` flip · `1` again · `2` got it · `←` `→` move · `F` furigana ·
   `E` english · `T` theme.
 - Progress is saved in `localStorage` — in your browser only, nothing is uploaded.
+
+## Sanity checks
+
+`sanity_data.py` is run against the deck and must come back clean before anything ships.
+It checks structure (no duplicate kanji, numbering without gaps, one sentence per word),
+every reading against KANJIDIC2, every word for containing its own kanji and having a
+kana-only reading, every sentence for being Japanese with final punctuation and no stray
+Latin/Cyrillic/Hangul, that the furigana runs reconstruct the sentence exactly, and that
+the nth sentence belongs to the nth word.
+
+`audit_ruby3.py` checks every ruby annotation over a multi-kanji compound against JMdict,
+absorbing trailing okurigana before judging — so 支払[しはら]い is recognised as correct
+rather than flagged. 6,351 exact matches, 140 correct once okurigana is absorbed, 0 wrong.
 
 ## How the data was checked
 
