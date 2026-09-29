@@ -1,6 +1,6 @@
 # Kanji for JLPT
 
-Flashcards and a searchable browser for **1,042 JLPT kanji** (N5 → N1), with readings,
+Flashcards and a searchable browser for **1,061 JLPT kanji** (N5 → N1), with readings,
 vocabulary and example sentences.
 
 **Live site:** https://shamimice03.github.io/jlpt-kanji/
@@ -11,17 +11,17 @@ vocabulary and example sentences.
 |---|---|
 | N5 | 80 |
 | N4 | 165 |
-| N3 | 377 |
+| N3 | 380 |
 | N2 | 386 |
-| N1 extras | 34 |
-| **Total** | **1,042** |
+| N1 extras | 50 |
+| **Total** | **1,061** |
 
 Each kanji has:
 
 - onyomi in katakana, kunyomi in hiragana
 - English meaning
 - 5–10 high-frequency vocabulary words with readings and English
-- one short, everyday example sentence per word — **5,217 sentences in all**
+- one short, everyday example sentence per word — **5,311 sentences in all**
 - whole-sentence furigana, switchable **On / Tap / Off**
 - English translations, switchable **Show / Hide**
 
@@ -45,13 +45,31 @@ JLPT kanji lists are unofficial — the Japan Foundation stopped publishing them
 independent lists and verifies the contents against real dictionaries:
 
 - **KANJIDIC2** — every onyomi, kunyomi and meaning (0 mismatches remaining)
-- **JMdict** — all 5,217 vocabulary words checked as real dictionary headwords
+- **JMdict** — all 5,311 vocabulary words checked as real dictionary headwords
 - **Kanji alive** (University of Chicago) — independent cross-check of the readings
 - **UniDic / fugashi** — sentence furigana, with 218 readings overridden by the
   JMdict-verified ones where the analyser mis-segmented a compound
 
 Eight genuine reading errors and around twenty non-dictionary vocabulary entries were
 found and fixed this way.
+
+### A note on the level counts
+
+JLPT level lists disagree at the boundaries, so the counts here are one defensible
+reading rather than the only one:
+
+- **N5 is 80**, matching the modern lists ([JLPTsensei](https://jlptsensei.com/jlpt-n5-kanji-list/)
+  says 80; KANJIDIC2's `jlpt_new` tags say 79). The "about 100" figure often quoted comes
+  from the **pre-2010 exam**, whose Level 4 had exactly 103 kanji — the 23 extras (手, 目,
+  買, 飲, 駅, 魚 …) are all in this deck, just filed as N4 or N3.
+- **N4 is 165**, against 166 in KANJIDIC2's `jlpt_new` and 170 in AnchorI. Every
+  difference is a kanji this deck places one level away, not one it is missing.
+- **N1 extras** are kanji that some list — usually the pre-2010 Level 2 list — expects at
+  N2, but which the modern lists moved to N1. They're included so nothing on any of the
+  reference lists is absent.
+
+Checked against the union of all three reference lists, **no kanji tagged N5–N2 by any of
+them is missing from this deck.**
 
 ## Running it
 
