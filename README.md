@@ -20,8 +20,8 @@ Each kanji has:
 
 - onyomi in katakana, kunyomi in hiragana
 - English meaning
-- 5–10 high-frequency vocabulary words with readings and English
-- one short, everyday example sentence per word — **5,311 sentences in all**
+- 5–11 high-frequency vocabulary words with readings and English
+- one short, everyday example sentence per word — **5,436 sentences in all**
 - whole-sentence furigana, switchable **On / Tap / Off**
 - English translations, switchable **Show / Hide**
 
@@ -45,7 +45,7 @@ JLPT kanji lists are unofficial — the Japan Foundation stopped publishing them
 independent lists and verifies the contents against real dictionaries:
 
 - **KANJIDIC2** — every onyomi, kunyomi and meaning (0 mismatches remaining)
-- **JMdict** — all 5,311 vocabulary words checked as real dictionary headwords
+- **JMdict** — all 5,436 vocabulary words checked as real dictionary headwords
 - **Kanji alive** (University of Chicago) — independent cross-check of the readings
 - **UniDic / fugashi** — sentence furigana, with 218 readings overridden by the
   JMdict-verified ones where the analyser mis-segmented a compound
@@ -70,6 +70,20 @@ reading rather than the only one:
 
 Checked against the union of all three reference lists, **no kanji tagged N5–N2 by any of
 them is missing from this deck.**
+
+### Vocabulary sourced from the JLPT word lists
+
+The vocabulary was originally chosen to illustrate each kanji, which meant words on the
+JLPT vocabulary lists could be absent. Every word from the
+[Tanos](https://www.tanos.co.uk/jlpt/) N5–N1 vocabulary lists that contains a kanji at
+that same level has now been added on top of what was already there — 125 words at N2,
+with the other levels to follow. Nothing was removed.
+
+Each added word was checked against JMdict for its headword and reading before inclusion;
+affix placeholders (`～`), kana-only entries and rare or archaic senses were filtered out.
+
+Vocabulary data from [Jonathan Waller's JLPT resources](https://www.tanos.co.uk/jlpt/),
+used under [CC BY](https://creativecommons.org/licenses/by/4.0/).
 
 ## Running it
 
