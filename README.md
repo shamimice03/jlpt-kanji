@@ -36,7 +36,11 @@ Each kanji has:
   on large displays.
 - Every vocabulary word carries the **JLPT vocabulary-list level** it appears on
   (N5–N1), and a **Words: My level** switch hides words harder than the level you're
-  studying, along with their sentences.
+  studying, along with their sentences. A dashed **—** badge means the word is on no
+  JLPT vocabulary list at all — about a third of the vocabulary here, which is normal:
+  党員 and 党首 are ordinary Japanese that the lists happen not to carry.
+- The title doubles as a **Home** button, and a floating **↑** returns you to the top of
+  a long card.
 - Keyboard: `Space` flip · `1` again · `2` got it · `←` `→` move · `F` furigana ·
   `E` english · `T` theme.
 - Progress is saved in `localStorage` — in your browser only, nothing is uploaded.
