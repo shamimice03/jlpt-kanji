@@ -68,7 +68,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);fon
 /* header */
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft)}
 .bar-in{max-width:var(--colw);margin:0 auto;padding:9px 16px}
-.row1{display:flex;align-items:center;gap:12px}
+.row1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .logo{font-family:var(--mincho);font-weight:700;font-size:1.125rem;white-space:nowrap;
       background:none;border:0;padding:4px 6px;margin-left:-6px;color:var(--ink);cursor:pointer;border-radius:7px}
 .logo:hover{background:var(--surface-3)}
@@ -179,6 +179,22 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
 .tile i.b3{background:var(--moss)}
 .empty{margin-top:24px;text-align:center;color:var(--faint);font-size:0.875rem}
 
+/* quiz options */
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.opt{font:inherit;font-size:0.9375rem;text-align:left;display:flex;align-items:baseline;gap:10px;
+  padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink);cursor:pointer;transition:border-color .12s ease,background .12s ease}
+.opt.jpopt{font-family:var(--jp);font-size:1.0625rem}
+.opt b{font-size:0.6875rem;font-weight:700;color:var(--faint);border:1px solid var(--line);
+  border-radius:4px;padding:0 5px;flex:none;font-family:var(--ui)}
+.opt:not(:disabled):hover{border-color:var(--indigo);background:var(--indigo-soft)}
+.opt:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.opt:disabled{cursor:default;opacity:.62}
+.opt.right{opacity:1;border-color:var(--moss);background:color-mix(in srgb,var(--moss) 12%,transparent);color:var(--ink)}
+.opt.right b{border-color:var(--moss);color:var(--moss)}
+.opt.wrong{opacity:1;border-color:var(--persimmon);background:color-mix(in srgb,var(--persimmon) 10%,transparent)}
+.opt.wrong b{border-color:var(--persimmon);color:var(--persimmon)}
+
 /* back to top */
 #toTop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;
   width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);
@@ -230,6 +246,8 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
   .stat{margin-left:auto;font-size:0.6875rem}
   .head{gap:12px}
   .keys{display:none}
+  .tabs{margin-left:0;width:100%;order:3}
+  .tabs button{flex:1;padding:6px 4px}
 }
 @media (max-width:420px){
   .face{padding:20px 15px}
@@ -254,6 +272,7 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
       <div class="tabs" role="tablist">
         <button role="tab" id="t-study" aria-selected="true">Kanji</button>
         <button role="tab" id="t-vocab" aria-selected="false">Vocab</button>
+        <button role="tab" id="t-quiz" aria-selected="false">Review</button>
         <button role="tab" id="t-browse" aria-selected="false">Browse</button>
       </div>
     </div>
@@ -342,6 +361,29 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
       cards — you see the word, recall its reading and meaning, then check against the example
       sentence. Progress here is kept separately from the kanji, so drilling a word doesn't mark
       its kanji learned. The level menu and the <b>Words</b> filter both apply.
+    </div>
+  </div>
+
+  <div id="quiz" hidden>
+    <div class="deckbar">
+      <select id="qsrc" aria-label="What to review">
+        <option value="seen" selected>Anything I've marked</option>
+        <option value="learned">Learned only (box 3+)</option>
+        <option value="all">Everything at this level</option>
+      </select>
+      <select id="qlen" aria-label="How many questions">
+        <option>10</option><option selected>20</option><option>30</option><option>50</option>
+      </select>
+      <button class="chip" id="qk" aria-pressed="true">Kanji</button>
+      <button class="chip" id="qv" aria-pressed="true">Vocab</button>
+      <button class="chip" id="qstart" aria-pressed="true" style="font-weight:600">Start</button>
+    </div>
+    <div id="qstage"></div>
+    <p class="keys"><kbd>1</kbd>–<kbd>4</kbd> answer · <kbd>Space</kbd> next question</p>
+    <div class="note">
+      <b>Mixed revision.</b> Random questions built from what you've marked <b>Got it</b> — kanji
+      meanings and readings, word readings and meanings, and fill-in-the-blank sentences, shuffled
+      together. Wrong answers knock that item back a box so it returns in the Kanji and Vocab decks.
     </div>
   </div>
 
@@ -738,18 +780,185 @@ function vmark(ok){
   save(); vmove(1);
 }
 
+/* ---------- review quiz ---------- */
+const shuffle = a => { for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const moras = s => (s || '').replace(/[ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ]/g,'').length;
+
+let qUseK = true, qUseV = true, qList = [], qPos = 0, qAnswered = null, qScore = 0, qMissed = [];
+
+/* which items are eligible, given the Source menu */
+function quizPools(){
+  const src = $('qsrc').value;
+  const okBox = (b, seen) => src === 'all' ? true : src === 'seen' ? seen > 0 : b >= 3;
+  const K = pool().filter(d => okBox(box(d.k), (prog[d.k] && prog[d.k].seen) || 0));
+  const V = vpool().filter(v => {
+    const p = prog[VKEY(v.w)];
+    return okBox(vbox(v.w), (p && p.seen) || 0);
+  });
+  return {K, V};
+}
+
+/* build one question; returns null if it can't be made */
+function makeQ(type, item, K, V){
+  const opts = (correct, others) => {
+    const o = [correct];
+    for (const c of others){ if (o.length >= 4) break; if (!o.includes(c) && c) o.push(c); }
+    return o.length >= 2 ? shuffle(o) : null;
+  };
+  if (type === 'k-mean'){
+    const others = shuffle(K.filter(d => d.k !== item.k)).map(d => d.m);
+    const o = opts(item.m, others); if (!o) return null;
+    return {q:`What does this kanji mean?`, big:item.k, sub:'', opts:o, ans:item.m, key:item.k, kind:'kanji'};
+  }
+  if (type === 'k-on'){
+    if (!item.o || item.o === '—') return null;
+    const others = shuffle(K.filter(d => d.k !== item.k && d.o && d.o !== '—' && moras(d.o) === moras(item.o))).map(d => d.o);
+    const loose  = shuffle(K.filter(d => d.k !== item.k && d.o && d.o !== '—')).map(d => d.o);
+    const o = opts(item.o, others.concat(loose)); if (!o) return null;
+    return {q:`Which is the on'yomi (音読み)?`, big:item.k, sub:item.m, opts:o, ans:item.o, key:item.k, kind:'kanji'};
+  }
+  if (type === 'w-read'){
+    const same = shuffle(V.filter(v => v.w !== item.w && moras(v.r) === moras(item.r))).map(v => v.r);
+    const any  = shuffle(V.filter(v => v.w !== item.w)).map(v => v.r);
+    const o = opts(item.r, same.concat(any)); if (!o) return null;
+    return {q:`How is this word read?`, big:item.w, sub:'', opts:o, ans:item.r, key:VKEY(item.w), kind:'word'};
+  }
+  if (type === 'w-mean'){
+    const others = shuffle(V.filter(v => v.w !== item.w)).map(v => v.en);
+    const o = opts(item.en, others); if (!o) return null;
+    return {q:`What does this word mean?`, big:item.w, sub:item.r, opts:o, ans:item.en, key:VKEY(item.w), kind:'word'};
+  }
+  if (type === 'mean-w'){
+    const others = shuffle(V.filter(v => v.w !== item.w && v.k === item.k)).map(v => v.w);
+    const any    = shuffle(V.filter(v => v.w !== item.w)).map(v => v.w);
+    const o = opts(item.w, others.concat(any)); if (!o) return null;
+    return {q:`Which word means this?`, big:'', sub:'', prompt:item.en, opts:o, ans:item.w, key:VKEY(item.w), kind:'word', jp:true};
+  }
+  if (type === 'cloze'){
+    const sent = plain(item.s[0]);
+    if (!sent.includes(item.w)) return null;
+    const blanked = sent.replace(item.w, '＿＿＿');
+    const same = shuffle(V.filter(v => v.w !== item.w && v.w.length === item.w.length)).map(v => v.w);
+    const any  = shuffle(V.filter(v => v.w !== item.w)).map(v => v.w);
+    const o = opts(item.w, same.concat(any)); if (!o) return null;
+    return {q:`Which word fills the gap?`, big:'', sub:item.s[1], prompt:blanked, opts:o, ans:item.w,
+            key:VKEY(item.w), kind:'word', jp:true, full:sent};
+  }
+  return null;
+}
+
+function buildQuiz(){
+  const {K, V} = quizPools();
+  const want = +$('qlen').value;
+  const kTypes = ['k-mean','k-on'], vTypes = ['w-read','w-mean','mean-w','cloze'];
+  const st = $('qstage');
+  if ((qUseK ? K.length : 0) + (qUseV ? V.length : 0) < 4){
+    st.innerHTML = `<p class="empty">Not enough to build a quiz yet.<br>
+      Mark some cards <b>Got it</b> in the Kanji or Vocab tab, or switch Source to “Everything at this level”.</p>`;    qList = []; return;
+  }
+  const bag = [];
+  const kPool = shuffle(K.slice()), vPool = shuffle(V.slice());
+  let ki = 0, vi = 0, guard = 0;
+  while (bag.length < want && guard++ < want * 12){
+    const useK = qUseK && (!qUseV || Math.random() < K.length / (K.length + V.length || 1));
+    let q = null;
+    if (useK && kPool.length) q = makeQ(pick(kTypes), kPool[ki++ % kPool.length], K, V);
+    else if (qUseV && vPool.length) q = makeQ(pick(vTypes), vPool[vi++ % vPool.length], K, V);
+    if (q && !bag.some(b => b.key === q.key && b.q === q.q)) bag.push(q);
+  }
+  qList = bag; qPos = 0; qAnswered = null; qScore = 0; qMissed = [];
+  qrender();
+}
+
+function qrender(){
+  const st = $('qstage');
+  if (!qList.length) return;
+  if (qPos >= qList.length){
+    const pct = Math.round(qScore / qList.length * 100);
+    st.innerHTML = `
+      <div class="card"><div class="done">
+        <div class="mark">${pct >= 80 ? '優' : pct >= 60 ? '良' : '可'}</div>
+        <h2>${qScore} of ${qList.length} correct</h2>
+        <p>${pct}%</p>
+      </div>
+      ${qMissed.length ? `<div class="face" style="padding-top:0">
+        <div class="sec"><h2>Worth another look</h2><ul class="vocab">` +
+        qMissed.map(m => `<li><span class="w">${esc(m.shown)}</span><span class="en">${esc(m.ans)}</span></li>`).join('') +
+        `</ul></div></div>` : ''}
+      </div>
+      <div class="foot"><button class="btn good" id="qagain">New quiz</button></div>`;
+    $('qagain').onclick = buildQuiz;
+    updateStat(); return;
+  }
+  const q = qList[qPos];
+  const body = q.prompt
+      ? `<div class="jp" style="text-align:center;font-size:${q.jp ? '1.35rem' : '1rem'};line-height:1.9">${esc(q.prompt)}</div>`
+      : `<div class="glyph" style="font-size:clamp(3rem,13vw,5rem)">${esc(q.big)}</div>`;
+  st.innerHTML = `
+    <div class="card"><div class="face">
+      <p class="hint" style="text-align:left;margin:0 0 14px">Question ${qPos+1} of ${qList.length} · ${qScore} correct</p>
+      <div class="prompt" style="padding-block:4px 16px;gap:8px">
+        ${body}
+        ${q.sub ? `<p class="hint">${esc(q.sub)}</p>` : ''}
+        <p class="hint" style="font-weight:600;color:var(--ink)">${esc(q.q)}</p>
+      </div>
+      <div class="opts">${q.opts.map((o,i) =>
+        `<button class="opt${q.jp||q.q.includes('read')||q.q.includes('yomi')?' jpopt':''}" data-o="${i}"><b>${i+1}</b>${esc(o)}</button>`).join('')}</div>
+      <div id="qfb"></div>
+    </div></div>`;
+  st.querySelectorAll('.opt').forEach(b => b.onclick = () => qanswer(+b.dataset.o));
+  qAnswered = null;
+}
+
+function qanswer(i){
+  if (qAnswered !== null) return;
+  const q = qList[qPos];
+  const chosen = q.opts[i];
+  const right = chosen === q.ans;
+  qAnswered = i;
+  if (right) qScore++;
+  else {
+    qMissed.push({shown: q.big || q.prompt, ans: q.ans});
+    const p = prog[q.key] || (prog[q.key] = {box:0, seen:0});
+    p.box = Math.max(0, p.box - 1);            /* knock it back so it returns in the decks */
+    p.seen++;
+    save();
+  }
+  $('qstage').querySelectorAll('.opt').forEach((b, j) => {
+    b.disabled = true;
+    if (q.opts[j] === q.ans) b.classList.add('right');
+    else if (j === i) b.classList.add('wrong');
+  });
+  $('qfb').innerHTML = `
+    <p class="hint" style="text-align:left;margin-top:14px;font-weight:600;color:${right?'var(--moss)':'var(--persimmon)'}">
+      ${right ? '正解 — correct' : '不正解 — the answer is ' + esc(q.ans)}</p>
+    ${q.full ? `<div class="jp" style="margin-top:6px">${esc(q.full)}</div>` : ''}
+    <div class="foot"><button class="btn good" id="qnext">${qPos+1 < qList.length ? 'Next question' : 'See result'}</button></div>`;
+  $('qnext').onclick = () => { qPos++; qrender(); };
+  updateStat();
+}
+
+$('qstart').onclick = buildQuiz;
+$('qsrc').onchange = buildQuiz;
+$('qlen').onchange = buildQuiz;
+$('qk').onclick = e => { qUseK = !qUseK; if (!qUseK && !qUseV){ qUseV = true; $('qv').setAttribute('aria-pressed', true); } e.currentTarget.setAttribute('aria-pressed', qUseK); buildQuiz(); };
+$('qv').onclick = e => { qUseV = !qUseV; if (!qUseK && !qUseV){ qUseK = true; $('qk').setAttribute('aria-pressed', true); } e.currentTarget.setAttribute('aria-pressed', qUseV); buildQuiz(); };
+
 /* ---------- tabs ---------- */
-const VIEWS = ['study','vocab','browse'];
+const VIEWS = ['study','vocab','quiz','browse'];
 let view = 'study';
 function show(v){
   view = v;
   VIEWS.forEach(x => { $(x).hidden = x !== v; $('t-'+x).setAttribute('aria-selected', String(x === v)); });
   if (v === 'browse') renderBrowse($('q').value);
   if (v === 'vocab' && !vorder.length) buildVDeck();
+  if (v === 'quiz'  && !qList.length)  buildQuiz();
   updateStat();
 }
 $('t-study').onclick  = () => show('study');
 $('t-vocab').onclick  = () => show('vocab');
+$('t-quiz').onclick   = () => show('quiz');
 $('t-browse').onclick = () => show('browse');
 
 /* the Words filter changes which words are in the vocabulary deck, so rebuild it */
@@ -779,6 +988,14 @@ document.addEventListener('keydown', e => {
   if (k === 'f'){ cycleFuri(); return; }
   if (k === 'e'){ toggleTrans(); return; }
   if (k === 't'){ cycleTheme(); return; }
+  if (view === 'quiz'){
+    if (qAnswered === null && '1234'.includes(k)){
+      const b = $('qstage').querySelector(`.opt[data-o="${+k - 1}"]`); if (b) b.click();
+    } else if (e.code === 'Space' || e.key === 'Enter'){
+      e.preventDefault(); const n = $('qnext'); if (n) n.click();
+    }
+    return;
+  }
   if (view === 'vocab'){
     if (e.code === 'Space'){ e.preventDefault(); if (!vflip && !vdone){ vflip = true; vrender(); } }
     else if (k === '1' && vflip && !vdone) vmark(0);
