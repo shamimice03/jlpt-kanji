@@ -34,6 +34,9 @@ Each kanji has:
   progress the Study tab uses.
 - **Light / dark / auto** theme, and a text-size control that also scales itself up
   on large displays.
+- Every vocabulary word carries the **JLPT vocabulary-list level** it appears on
+  (N5–N1), and a **Words: My level** switch hides words harder than the level you're
+  studying, along with their sentences.
 - Keyboard: `Space` flip · `1` again · `2` got it · `←` `→` move · `F` furigana ·
   `E` english · `T` theme.
 - Progress is saved in `localStorage` — in your browser only, nothing is uploaded.
@@ -78,6 +81,13 @@ JLPT vocabulary lists could be absent. Every word from the
 [Tanos](https://www.tanos.co.uk/jlpt/) N5–N1 vocabulary lists that contains a kanji at
 that same level has now been added on top of what was already there — 125 words at N2,
 with the other levels to follow. Nothing was removed.
+
+Because that rule only reaches words built around a same-level kanji, it covers 588 of
+the N2 list's 1,748 entries. Work is under way to attach every list word to whichever
+deck kanji it contains, regardless of level — 1,299 more words across the N5–N2 lists.
+A kanji deck can reach at most about two thirds of a vocabulary list either way: 253 N2
+entries are kana-only (ショップ, すっきり) and 163 need kanji outside the deck, so they
+have no kanji card to sit on.
 
 Each added word was checked against JMdict for its headword and reading before inclusion;
 affix placeholders (`～`), kana-only entries and rare or archaic senses were filtered out.
