@@ -390,6 +390,8 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
     <div class="deckbar">
       <select id="qsrc" aria-label="What to review">
         <option value="seen" selected>Anything I've marked</option>
+        <option value="today">Marked today</option>
+        <option value="week">Marked in the last 7 days</option>
         <option value="learned">Learned only (box 3+)</option>
         <option value="all">Everything at this level</option>
       </select>
@@ -639,7 +641,7 @@ function move(d){
 function mark(ok){
   const k = order[pos];
   const p = prog[k] || (prog[k] = {box:0, seen:0});
-  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0;
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0; p.t = Date.now();
   if (ok) good++; else again++;
   save(); move(1);
 }
@@ -726,7 +728,7 @@ function openDetail(k){
 }
 function browseMark(ok){
   const p = prog[browseK] || (prog[browseK] = {box:0, seen:0});
-  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0;
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0; p.t = Date.now();
   save(); updateStat();
   const el = $('bst'); if (el) el.innerHTML = stateLine(browseK);
   /* if this card is in the deck being studied, keep that view honest too */
@@ -836,7 +838,7 @@ function vmove(d){
 function vmark(ok){
   const key = VKEY(vorder[vpos].w);
   const p = prog[key] || (prog[key] = {box:0, seen:0});
-  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0;
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0; p.t = Date.now();
   if (ok) vgood++; else vagain++;
   save(); vmove(1);
 }
@@ -870,15 +872,23 @@ const moras = s => (s || '').replace(/[ぁぃぅぇぉゃゅょゎァィゥェ�
 
 let qUseK = true, qUseV = true, qList = [], qPos = 0, qAnswered = null, qScore = 0, qMissed = [];
 
+/* start of today, in the viewer's own timezone */
+const dayStart = () => { const d = new Date(); d.setHours(0,0,0,0); return d.getTime(); };
+const since = n => dayStart() - (n - 1) * 86400000;
+
 /* which items are eligible, given the Source menu */
 function quizPools(){
   const src = $('qsrc').value;
-  const okBox = (b, seen) => src === 'all' ? true : src === 'seen' ? seen > 0 : b >= 3;
-  const K = pool().filter(d => okBox(box(d.k), (prog[d.k] && prog[d.k].seen) || 0));
-  const V = vpool().filter(v => {
-    const p = prog[VKEY(v.w)];
-    return okBox(vbox(v.w), (p && p.seen) || 0);
-  });
+  const cut = src === 'today' ? dayStart() : src === 'week' ? since(7) : 0;
+  const ok = p => {
+    if (src === 'all') return true;
+    if (!p) return false;
+    if (src === 'learned') return (p.box || 0) >= 3;
+    if (cut) return (p.t || 0) >= cut;
+    return (p.seen || 0) > 0;
+  };
+  const K = pool().filter(d => ok(prog[d.k]));
+  const V = vpool().filter(v => ok(prog[VKEY(v.w)]));
   return {K, V};
 }
 
@@ -944,8 +954,13 @@ function buildQuiz(){
   const kTypes = ['k-mean','k-on'], vTypes = ['w-read','w-mean','mean-w','cloze'];
   const st = $('qstage');
   if ((qUseK ? K.length : 0) + (qUseV ? V.length : 0) < 4){
-    st.innerHTML = `<p class="empty">Not enough to build a quiz yet.<br>
-      Mark some cards <b>Got it</b> in the Kanji or Vocab tab, or switch Source to “Everything at this level”.</p>`;    qList = []; return;
+    const src = $('qsrc').value;
+    const why = src === 'today' ? 'Nothing marked today yet.'
+              : src === 'week'  ? 'Nothing marked in the last 7 days.'
+              : src === 'learned' ? 'Nothing has reached box 3 yet — that takes three correct reviews.'
+              : 'Not enough to build a quiz yet.';
+    st.innerHTML = `<p class="empty">${why}<br>
+      Study some cards in the Kanji or Vocab tab, or change <b>Source</b> above.</p>`;    qList = []; return;
   }
   const bag = [];
   const kPool = shuffle(K.slice()), vPool = shuffle(V.slice());
@@ -1016,7 +1031,7 @@ function qanswer(i){
     qMissed.push({shown: q.big || q.prompt, ans: q.ans});
     const p = prog[q.key] || (prog[q.key] = {box:0, seen:0});
     p.box = Math.max(0, p.box - 1);            /* knock it back so it returns in the decks */
-    p.seen++;
+    p.seen++; p.t = Date.now();
     save();
   }
   $('qstage').querySelectorAll('.opt').forEach((b, j) => {
@@ -1111,11 +1126,12 @@ $('impf').onchange = e => {
       const box  = Math.max(0, Math.min(5, Number(v.box)  || 0));
       const seen = Math.max(0, Number(v.seen) || 0);
       const cur = prog[key];
-      if (!cur){ prog[key] = {box, seen}; added++; }
+      if (!cur){ prog[key] = {box, seen}; if (v.t) prog[key].t = Number(v.t) || 0; added++; }
       else {
         const nb = Math.max(cur.box || 0, box), ns = Math.max(cur.seen || 0, seen);
+        const nt = Math.max(cur.t || 0, Number(v.t) || 0);
         if (nb !== cur.box || ns !== cur.seen) raised++;
-        cur.box = nb; cur.seen = ns;
+        cur.box = nb; cur.seen = ns; if (nt) cur.t = nt;
       }
     }
     save();
@@ -1186,10 +1202,11 @@ function mergeItems(items){
     const box = Math.max(0, Math.min(5, Number(v.box) || 0));
     const seen = Math.max(0, Number(v.seen) || 0);
     const cur = prog[key];
-    if (!cur){ prog[key] = {box, seen}; added++; }
+    if (!cur){ prog[key] = {box, seen}; if (v.t) prog[key].t = Number(v.t) || 0; added++; }
     else { const nb = Math.max(cur.box||0, box), ns = Math.max(cur.seen||0, seen);
+           const nt = Math.max(cur.t||0, Number(v.t)||0);
            if (nb !== cur.box || ns !== cur.seen) raised++;
-           cur.box = nb; cur.seen = ns; }
+           cur.box = nb; cur.seen = ns; if (nt) cur.t = nt; }
   }
   return {added, raised};
 }

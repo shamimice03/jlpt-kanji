@@ -34,7 +34,9 @@ Each kanji has:
   progress, kept apart from the kanji, plus an **On a list** filter for words that appear on
   a JLPT vocabulary list.
 - **Review** — randomised multiple-choice questions built from whatever you've marked
-  **Got it**, mixing kanji and vocabulary. Six question types: kanji → meaning, kanji →
+  **Got it**, mixing kanji and vocabulary. Source can be everything you've marked,
+  **just today**, the **last 7 days**, only what has reached box 3, or everything at the
+  current level. Six question types: kanji → meaning, kanji →
   on'yomi, word → reading, word → meaning, meaning → word, and fill-in-the-blank from the
   example sentences. A wrong answer knocks that item back a Leitner box, so it returns in
   the Kanji and Vocab decks.
