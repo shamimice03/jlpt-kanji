@@ -202,6 +202,13 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
 .opt.wrong{opacity:1;border-color:var(--persimmon);background:color-mix(in srgb,var(--persimmon) 10%,transparent)}
 .opt.wrong b{border-color:var(--persimmon);color:var(--persimmon)}
 
+.datarow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line-soft)}
+.dlabel{font-size:0.6562rem;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;margin-right:4px}
+.dlabel em{font-family:var(--jp);font-style:normal;letter-spacing:0;text-transform:none;opacity:.8}
+.dmsg{font-size:0.75rem;color:var(--moss);margin-left:4px}
+.dmsg.err{color:var(--persimmon)}
+.dnote{font-size:0.75rem;color:var(--faint);line-height:1.7;margin:8px 0 0}
+
 /* back to top */
 #toTop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;
   width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);
@@ -402,6 +409,19 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
     <div id="results"></div>
     <p class="keys">Open any kanji to mark it <b>Got it</b> or <b>Again</b> — the same progress the Study tab uses. <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>→</kbd> next · <kbd>Esc</kbd> back</p>
   </div>
+</div>
+
+<div class="wrap" style="padding-block:0 40px">
+  <div class="datarow">
+    <span class="dlabel">Progress <em>学習記録</em></span>
+    <button class="chip" id="exp">Export</button>
+    <button class="chip" id="imp">Import</button>
+    <button class="chip" id="rst">Reset</button>
+    <input type="file" id="impf" accept="application/json,.json" hidden>
+    <span class="dmsg" id="dmsg"></span>
+  </div>
+  <p class="dnote">Progress lives in this browser only. Export it to carry it to another
+  device or browser, or to keep a backup — importing merges, so nothing already learned is lost.</p>
 </div>
 
 <button id="toTop" title="Back to top" aria-label="Back to top">↑</button>
@@ -1011,6 +1031,73 @@ $('qsrc').onchange = buildQuiz;
 $('qlen').onchange = buildQuiz;
 $('qk').onclick = e => { qUseK = !qUseK; if (!qUseK && !qUseV){ qUseV = true; $('qv').setAttribute('aria-pressed', true); } e.currentTarget.setAttribute('aria-pressed', qUseK); buildQuiz(); };
 $('qv').onclick = e => { qUseV = !qUseV; if (!qUseK && !qUseV){ qUseK = true; $('qk').setAttribute('aria-pressed', true); } e.currentTarget.setAttribute('aria-pressed', qUseV); buildQuiz(); };
+
+/* ---------- progress export / import ---------- */
+const dmsg = (t, err) => { const el = $('dmsg'); el.textContent = t; el.classList.toggle('err', !!err);
+                           clearTimeout(dmsg._t); dmsg._t = setTimeout(() => { el.textContent = ''; }, 6000); };
+const countItems = o => { let k = 0, w = 0;
+  for (const key in o) (key.startsWith('w|') ? w++ : k++); return {k, w, n: k + w}; };
+
+$('exp').onclick = () => {
+  const c = countItems(prog);
+  if (!c.n) return dmsg('Nothing studied yet — nothing to export.', true);
+  const payload = {app:'kanji-for-jlpt', version:1, exported:new Date().toISOString(),
+                   counts:{kanji:c.k, words:c.w}, items:prog};
+  const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = `kanji-progress-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  dmsg(`Exported ${c.k} kanji and ${c.w} words.`);
+};
+
+$('imp').onclick = () => $('impf').click();
+$('impf').onchange = e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  const r = new FileReader();
+  r.onerror = () => dmsg('Could not read that file.', true);
+  r.onload = () => {
+    let data;
+    try { data = JSON.parse(r.result); } catch(err){ return dmsg('That is not a valid progress file.', true); }
+    const items = data && data.items;
+    if (!items || typeof items !== 'object' || Array.isArray(items))
+      return dmsg('That file has no progress in it.', true);
+    /* merge by taking the better of the two, so re-importing the same file changes nothing */
+    let added = 0, raised = 0;
+    for (const key in items){
+      const v = items[key];
+      if (!v || typeof v !== 'object') continue;
+      const box  = Math.max(0, Math.min(5, Number(v.box)  || 0));
+      const seen = Math.max(0, Number(v.seen) || 0);
+      const cur = prog[key];
+      if (!cur){ prog[key] = {box, seen}; added++; }
+      else {
+        const nb = Math.max(cur.box || 0, box), ns = Math.max(cur.seen || 0, seen);
+        if (nb !== cur.box || ns !== cur.seen) raised++;
+        cur.box = nb; cur.seen = ns;
+      }
+    }
+    save();
+    buildDeck(); vSetIdx = 0; buildVDeck(); qList = [];
+    if (!$('browse').hidden) renderBrowse($('q').value);
+    updateStat();
+    dmsg(added || raised ? `Merged: ${added} new, ${raised} updated.` : 'Already up to date — nothing changed.');
+  };
+  r.readAsText(f);
+};
+
+$('rst').onclick = () => {
+  const c = countItems(prog);
+  if (!c.n) return dmsg('Nothing to reset.', true);
+  if (!confirm(`Erase progress for ${c.k} kanji and ${c.w} words? Export first if you want to keep it. This cannot be undone.`)) return;
+  prog = {}; save();
+  buildDeck(); vSetIdx = 0; buildVDeck(); qList = [];
+  if (!$('browse').hidden) renderBrowse($('q').value);
+  updateStat();
+  dmsg('Progress cleared.');
+};
 
 /* ---------- tabs ---------- */
 const VIEWS = ['study','vocab','quiz','browse'];

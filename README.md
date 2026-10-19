@@ -55,6 +55,10 @@ Each kanji has:
 - Keyboard: `Space` flip · `1` again · `2` got it · `←` `→` move · `F` furigana ·
   `E` english · `T` theme.
 - Progress is saved in `localStorage` — in your browser only, nothing is uploaded.
+- **Export / Import** at the foot of the page moves that progress between devices and
+  browsers as a small JSON file. Import *merges* (it keeps the higher box and review count
+  for each item), so re-importing the same file is a no-op and nothing already learned is
+  ever lost. Everything studied comes to roughly 160 KB at most.
 
 ## Sanity checks
 
