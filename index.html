@@ -207,6 +207,11 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
 .dlabel em{font-family:var(--jp);font-style:normal;letter-spacing:0;text-transform:none;opacity:.8}
 .dmsg{font-size:0.75rem;color:var(--moss);margin-left:4px}
 .dmsg.err{color:var(--persimmon)}
+.dsep{width:1px;height:18px;background:var(--line);margin:0 4px}
+.dfile{font-size:0.75rem;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.dfile b{font-weight:600;color:var(--ink)}
+.dfile i{width:7px;height:7px;border-radius:50%;background:var(--moss);font-style:normal;flex:none}
+.dfile i.warn{background:#D9A441}
 .dnote{font-size:0.75rem;color:var(--faint);line-height:1.7;margin:8px 0 0}
 
 /* back to top */
@@ -418,10 +423,17 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
     <button class="chip" id="imp">Import</button>
     <button class="chip" id="rst">Reset</button>
     <input type="file" id="impf" accept="application/json,.json" hidden>
+    <span class="dsep" id="dsep" hidden></span>
+    <button class="chip" id="link" hidden>Link a file…</button>
+    <button class="chip" id="unlink" hidden>Unlink</button>
+    <span class="dfile" id="dfile" hidden></span>
     <span class="dmsg" id="dmsg"></span>
   </div>
-  <p class="dnote">Progress lives in this browser only. Export it to carry it to another
-  device or browser, or to keep a backup — importing merges, so nothing already learned is lost.</p>
+  <p class="dnote">Progress lives in this browser. <b>Export</b> carries it to another device, and
+  <b>Import</b> merges it back, so nothing already learned is lost. <b>Link a file</b> goes further:
+  pick a file once and progress saves into it as you study and is restored whenever you return —
+  put it in a synced folder and your phone and laptop stay in step. That part needs Chrome or Edge
+  on a computer; everywhere else, use Export and Import.</p>
 </div>
 
 <button id="toTop" title="Back to top" aria-label="Back to top">↑</button>
@@ -439,7 +451,8 @@ const stage = $('stage'), trackEl = $('track'), statEl = $('stat');
 const KEY = 'n2kanji-v1';
 let prog = {};
 try { prog = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) { prog = {}; }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prog)); } catch(e){} };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prog)); } catch(e){}
+                     if (typeof fhQueue === 'function') fhQueue(); };
 const box = k => (prog[k] && prog[k].box) || 0;
 
 /* ---------- settings ---------- */
@@ -1124,6 +1137,131 @@ $('rst').onclick = () => {
   updateStat();
   dmsg('Progress cleared.');
 };
+
+/* ---------- linked file: keep progress in a file you choose ----------
+   File System Access API: Chromium desktop over HTTPS only, and the browser
+   will not re-grant access silently after a reload, so a reconnect click is
+   expected. Everywhere else the Export/Import buttons above are the answer. */
+const FS_OK = typeof window.showSaveFilePicker === 'function' && window.isSecureContext;
+let fh = null, fhDirty = false, fhTimer = null;
+
+const idb = () => new Promise((res, rej) => {
+  const r = indexedDB.open('kanji-fs', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('h');
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+/* Remembering the handle is a convenience: IndexedDB is unavailable on opaque
+   origins and in some private windows, and failing to remember must never stop
+   the link working for this session. */
+const idbPut = async (k, v) => { try { const d = await idb(); return await new Promise((res, rej) => {
+  const t = d.transaction('h', 'readwrite'); t.objectStore('h').put(v, k);
+  t.oncomplete = res; t.onerror = () => rej(t.error); }); } catch(e){ return null; } };
+const idbGet = async k => { try { const d = await idb(); return await new Promise((res, rej) => {
+  const t = d.transaction('h', 'readonly'), q = t.objectStore('h').get(k);
+  q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); } catch(e){ return null; } };
+
+function showLink(state, name){
+  $('dsep').hidden = $('link').hidden = !FS_OK;
+  $('unlink').hidden = $('dfile').hidden = !(FS_OK && state !== 'none');
+  if (!FS_OK) return;
+  $('link').hidden = state !== 'none';
+  if (state === 'none') return;
+  $('dfile').innerHTML = state === 'ok'
+    ? `<i></i>Syncing to <b>${esc(name)}</b>`
+    : `<i class="warn"></i><b>${esc(name)}</b> — click Reconnect`;
+  if (state === 'stale'){ $('link').hidden = false; $('link').textContent = 'Reconnect'; }
+  else $('link').textContent = 'Link a file…';
+}
+
+const payloadNow = () => {
+  const c = countItems(prog);
+  return JSON.stringify({app:'kanji-for-jlpt', version:1, exported:new Date().toISOString(),
+                         counts:{kanji:c.k, words:c.w}, items:prog});
+};
+function mergeItems(items){
+  let added = 0, raised = 0;
+  for (const key in items){
+    const v = items[key];
+    if (!v || typeof v !== 'object') continue;
+    const box = Math.max(0, Math.min(5, Number(v.box) || 0));
+    const seen = Math.max(0, Number(v.seen) || 0);
+    const cur = prog[key];
+    if (!cur){ prog[key] = {box, seen}; added++; }
+    else { const nb = Math.max(cur.box||0, box), ns = Math.max(cur.seen||0, seen);
+           if (nb !== cur.box || ns !== cur.seen) raised++;
+           cur.box = nb; cur.seen = ns; }
+  }
+  return {added, raised};
+}
+function refreshAll(){
+  buildDeck(); vSetIdx = 0; buildVDeck(); qList = [];
+  if (!$('browse').hidden) renderBrowse($('q').value);
+  updateStat();
+}
+async function fhWrite(){
+  if (!fh) return;
+  try { const w = await fh.createWritable(); await w.write(payloadNow()); await w.close(); fhDirty = false; }
+  catch(e){ showLink('stale', fh.name); }
+}
+const fhQueue = () => { if (!fh) return; fhDirty = true;
+  clearTimeout(fhTimer); fhTimer = setTimeout(fhWrite, 1200); };
+document.addEventListener('visibilitychange', () => { if (document.hidden && fhDirty) fhWrite(); });
+window.addEventListener('pagehide', () => { if (fhDirty) fhWrite(); });
+
+async function adoptFile(handle, announce){
+  fh = handle;
+  let merged = {added:0, raised:0};
+  try {
+    const txt = await (await handle.getFile()).text();
+    if (txt.trim()){
+      const data = JSON.parse(txt);
+      if (data && data.items) merged = mergeItems(data.items);
+    }
+  } catch(e){ /* empty or unreadable file: we will simply write ours into it */ }
+  if (merged.added || merged.raised){ save(); refreshAll(); }
+  await fhWrite();
+  showLink('ok', handle.name);
+  if (announce) dmsg(merged.added || merged.raised
+      ? `Linked. Restored ${merged.added} new, ${merged.raised} updated.`
+      : 'Linked — progress now saves to that file automatically.');
+}
+
+$('link').onclick = async () => {
+  try {
+    if (fh){                                   /* reconnect an existing link */
+      if (await fh.requestPermission({mode:'readwrite'}) === 'granted') return adoptFile(fh, true);
+      return dmsg('Permission denied for that file.', true);
+    }
+    const handle = await window.showSaveFilePicker({
+      suggestedName: 'kanji-progress.json',
+      types: [{description:'Kanji progress', accept:{'application/json':['.json']}}]
+    });
+    await idbPut('file', handle);
+    await adoptFile(handle, true);
+  } catch(e){
+    if (!e || e.name === 'AbortError') return;                       /* picker dismissed */
+    dmsg(e.name === 'SecurityError' ? 'This browser blocked file access here.'
+       : 'Could not link that file: ' + (e.message || e.name), true);
+  }
+};
+$('unlink').onclick = async () => {
+  fh = null; clearTimeout(fhTimer); fhDirty = false;
+  try { await idbPut('file', null); } catch(e){}
+  showLink('none'); dmsg('Unlinked. Progress still saves in this browser.');
+};
+
+(async () => {
+  showLink('none');
+  if (!FS_OK) return;
+  const handle = await idbGet('file');
+  if (!handle || typeof handle.queryPermission !== 'function') return;
+  fh = handle;
+  try {
+    const perm = await handle.queryPermission({mode:'readwrite'});
+    if (perm === 'granted') await adoptFile(handle, false);
+    else showLink('stale', handle.name);          /* needs a click; browsers require it */
+  } catch(e){ showLink('stale', handle.name); }
+})();
 
 /* ---------- tabs ---------- */
 const VIEWS = ['study','vocab','quiz','browse'];

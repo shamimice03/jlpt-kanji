@@ -59,6 +59,14 @@ Each kanji has:
   browsers as a small JSON file. Import *merges* (it keeps the higher box and review count
   for each item), so re-importing the same file is a no-op and nothing already learned is
   ever lost. Everything studied comes to roughly 160 KB at most.
+- **Link a file** goes further: pick a file once and progress is written into it as you
+  study (debounced, plus on leaving the page) and merged back in automatically whenever you
+  return. Put that file in Dropbox, iCloud Drive or a synced folder and two computers stay
+  in step on their own. It uses the File System Access API, so it needs **Chrome or Edge on
+  a desktop over HTTPS** — the button simply does not appear elsewhere, and Export/Import
+  remains the answer on Firefox, Safari and phones. Browsers will not silently re-grant
+  access to a file across sessions, so an occasional one-click **Reconnect** is expected
+  rather than a fault.
 
 ## Sanity checks
 
