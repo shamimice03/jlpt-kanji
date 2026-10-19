@@ -622,25 +622,43 @@ function browseList(){
     d.v.some(v => v[0].includes(t) || v[1].includes(t) || v[2].toLowerCase().includes(t)) ||
     d.s.some(s => s[1].toLowerCase().includes(t) || plain(s[0]).includes(t)));
 }
+const matches = (d, t) =>
+  d.k === t || d.k.includes(t) ||
+  (d.o || '').toLowerCase().includes(t) || (d.u || '').toLowerCase().includes(t) ||
+  (d.m || '').toLowerCase().includes(t) ||
+  d.v.some(v => v[0].includes(t) || v[1].includes(t) || v[2].toLowerCase().includes(t)) ||
+  d.s.some(s => s[1].toLowerCase().includes(t) || plain(s[0]).includes(t));
+
 function renderBrowse(term){
   const t = (term || '').trim().toLowerCase();
   browseK = null;
   let list = pool();
+  /* a search always looks at every level; the filter must not hide a kanji you asked for */
+  let elsewhere = 0, elseKanji = '';
   if (t){
-    list = pool().filter(d =>
-      d.k === t || d.k.includes(t) ||
-      (d.o || '').toLowerCase().includes(t) || (d.u || '').toLowerCase().includes(t) ||
-      (d.m || '').toLowerCase().includes(t) ||
-      d.v.some(v => v[0].includes(t) || v[1].includes(t) || v[2].toLowerCase().includes(t)) ||
-      d.s.some(s => s[1].toLowerCase().includes(t) || plain(s[0]).includes(t)));
+    list = pool().filter(d => matches(d, t));
+    if (level !== 'all'){
+      const all = DATA.filter(d => matches(d, t));
+      elsewhere = all.length - list.length;
+      elseKanji = all.filter(d => !list.includes(d)).slice(0, 12).map(d => d.k).join('');
+    }
   }
-  if (!list.length){ $('results').innerHTML = `<p class="empty">No kanji match “${esc(term)}”.</p>`; return; }
-  $('results').innerHTML = `<div class="grid">` + list.map(d => {
+  const banner = elsewhere ? `<div class="note" style="margin-top:14px">
+      <b>${elsewhere} more match outside ${esc(level)}:</b> <span class="jp">${esc(elseKanji)}</span>${elsewhere > 12 ? ' …' : ''}
+      <button class="chip" id="seeall" style="margin-left:8px">Show all levels</button></div>` : '';
+  const wire = () => { const s = $('seeall'); if (s) s.onclick = () => {
+      $('lvlSel').value = 'all'; $('lvlSel').dispatchEvent(new Event('change')); }; };
+  if (!list.length){
+    $('results').innerHTML = `<p class="empty">No kanji at ${esc(level)} match “${esc(term)}”.</p>` + banner;
+    wire(); return;
+  }
+  $('results').innerHTML = banner + `<div class="grid">` + list.map(d => {
     const b = box(d.k);
     const dot = b >= 3 ? 'b3' : b >= 1 ? 'b2' : (prog[d.k] ? 'b1' : '');
     return `<button class="tile" data-k="${esc(d.k)}" title="${esc(d.m)}">${esc(d.k)}${dot ? `<i class="${dot}"></i>` : ''}${d.x ? `<em class="${d.x===1?'':'n'+d.x}">${d.x===1?'N1':'N'+d.x}</em>` : ''}</button>`;
   }).join('') + `</div>`;
   $('results').querySelectorAll('.tile').forEach(b => b.onclick = () => openDetail(b.dataset.k));
+  wire();
 }
 function stateLine(k){
   const b = box(k), seen = (prog[k] && prog[k].seen) || 0;

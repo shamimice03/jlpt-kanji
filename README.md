@@ -39,7 +39,9 @@ Each kanji has:
   example sentences. A wrong answer knocks that item back a Leitner box, so it returns in
   the Kanji and Vocab decks.
 - **Browse** — a grid of every kanji with search across kanji, readings, meanings,
-  vocabulary and sentences; open any card to grade it *Again* / *Got it*, the same
+  vocabulary and sentences. Search always looks at every level: if matches fall outside
+  the level you're filtered to, it says how many and offers to show them, so the filter
+  can never hide a kanji you asked for by name. open any card to grade it *Again* / *Got it*, the same
   progress the Study tab uses.
 - **Light / dark / auto** theme, and a text-size control that also scales itself up
   on large displays.
