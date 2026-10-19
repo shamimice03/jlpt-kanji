@@ -1043,13 +1043,39 @@ $('exp').onclick = () => {
   if (!c.n) return dmsg('Nothing studied yet — nothing to export.', true);
   const payload = {app:'kanji-for-jlpt', version:1, exported:new Date().toISOString(),
                    counts:{kanji:c.k, words:c.w}, items:prog};
-  const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
-  const url = URL.createObjectURL(blob), a = document.createElement('a');
-  a.href = url; a.download = `kanji-progress-${new Date().toISOString().slice(0,10)}.json`;
+  const text = JSON.stringify(payload);
+  const name = `kanji-progress-${new Date().toISOString().slice(0,10)}.json`;
+  saveFile(name, text, `Exported ${c.k} kanji and ${c.w} words.`);
+};
+
+/* Saving differs by host: a plain page downloads a blob, while the artifact viewer
+   never grants pages a direct download and mediates it through its own capability. */
+let savePath = null;
+async function saveFile(name, text, okMsg){
+  if (savePath === null){
+    savePath = 'blob';
+    try {
+      if (window.claude && typeof window.claude.use === 'function'){
+        const d = await window.claude.use('downloads');
+        if (d && typeof d.save === 'function') savePath = d;
+      }
+    } catch(e){ savePath = 'blob'; }
+  }
+  if (savePath !== 'blob'){
+    try { await savePath.save({filename:name, data:text}); dmsg(okMsg); }
+    catch(err){
+      dmsg(err && err.code === 'declined' ? 'Save cancelled.'
+         : 'Could not save the file here — open the site version to export.', true);
+    }
+    return;
+  }
+  const url = URL.createObjectURL(new Blob([text], {type:'application/json'}));
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  dmsg(`Exported ${c.k} kanji and ${c.w} words.`);
-};
+  dmsg(okMsg);
+}
 
 $('imp').onclick = () => $('impf').click();
 $('impf').onchange = e => {
