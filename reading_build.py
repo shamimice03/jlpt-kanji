@@ -8,9 +8,10 @@ from reading_n2   import PASSAGES as _P2
 from reading_n2b  import PASSAGES as _P3
 from reading_n2c  import PASSAGES as _P4
 from reading_n2e  import PASSAGES as _P5
+from reading_n2f  import PASSAGES as _P6
 from reading_sent_en import SENT_EN
 from furigana import full_furigana
-PASSAGES = _P1 + _P2 + _P3 + _P4 + _P5
+PASSAGES = _P1 + _P2 + _P3 + _P4 + _P5 + _P6
 KAN = re.compile(r'[一-鿿々]')
 
 def split_jp(line):

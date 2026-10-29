@@ -6,7 +6,8 @@ from reading_n2 import PASSAGES as _P2
 from reading_n2b import PASSAGES as _P3
 from reading_n2c import PASSAGES as _P4
 from reading_n2e import PASSAGES as _P5
-PASSAGES = _P1 + _P2 + _P3 + _P4 + _P5
+from reading_n2f import PASSAGES as _P6
+PASSAGES = _P1 + _P2 + _P3 + _P4 + _P5 + _P6
 
 lv = json.load(open('kanji_by_level.json', encoding='utf-8'))
 TIERS = {'N5': set(lv['N5']),
