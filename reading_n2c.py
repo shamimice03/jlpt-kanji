@@ -269,4 +269,41 @@ PASSAGES = [
     "why": "「十一枚つづりで、大人十枚分の料金」「どなたでも」使えますが、"
            "夜間料金には使えません。土日に使えないとは書かれていません。"},
  ]},
+{
+ "id": "t7", "tier": "N2", "kind": "内容理解（短文）", "title": "一つだけ決める",
+ "body": "旅行の前に、行きたい場所をいくつも書き出すのが好きだった。"
+         "地図に印をつけ、移動にかかる時間を調べ、朝から晩までの予定を組む。"
+         "計画を立てている間がいちばん楽しい、とさえ思っていた。\n"
+         "ところが実際に出かけてみると、予定を守ることに気を取られて、"
+         "目の前の景色をほとんど見ていないことに気づいた。写真をとり、次の場所へ急ぐ。"
+         "帰ってきて思い出せるのは、駅から駅への道ばかりだった。\n"
+         "それ以来、行き先は一つだけ決めて、あとは決めないことにしている。"
+         "残った時間に何をするかは、その日の気分と天気に任せる。"
+         "予定の少ない旅のほうが、ふしぎと覚えていることは多い。",
+ "en": "Before a trip I used to enjoy writing out all the places I wanted to go. I would mark "
+       "a map, look up how long each journey took, and build a schedule from morning to night. "
+       "I even thought the time spent planning was the best part.\n"
+       "But when I actually set off, I found I was so taken up with keeping to the schedule "
+       "that I was barely seeing the scenery in front of me. Take a photo, hurry to the next "
+       "place. What I could recall afterwards was only the route from station to station.\n"
+       "Since then I decide on one destination and leave the rest undecided. What to do with "
+       "the time left over I leave to the mood and the weather of the day. Oddly enough, I "
+       "remember more from the trips with less planned.",
+ "qs": [
+   {"q": "筆者は旅行についてどう考えるようになったか。",
+    "opts": ["計画を立てている時間がいちばん楽しい",
+             "写真を多くとったほうが思い出に残る",
+             "行き先を一つだけ決め、あとは決めないほうがよい",
+             "移動にかかる時間を正確に調べておくべきだ"], "ans": 2,
+    "why": "「行き先は一つだけ決めて、あとは決めないことにしている」"
+           "「予定の少ない旅のほうが…覚えていることは多い」とあります。"
+           "1は以前の考えです。"},
+   {"q": "以前の旅行で、筆者は何に気づいたか。",
+    "opts": ["思ったより移動に時間がかかること",
+             "予定に気を取られて景色を見ていないこと",
+             "写真が思ったようにとれないこと",
+             "一日で回れる場所は少ないこと"], "ans": 1,
+    "why": "「予定を守ることに気を取られて、目の前の景色をほとんど見ていないことに気づいた」"
+           "とあります。"},
+ ]},
 ]
