@@ -46,7 +46,9 @@ Each kanji has:
   主張理解（長文）and 情報検索 (a notice you search rather than read). The passage list follows
   the Level menu, so "N2 only" shows only N2. Every passage is restricted to kanji at or below
   its level and `reading_check.py` enforces it — an N3 passage cannot contain an N2 character.
-  Furigana (On/Tap/Off) and the English translation follow the usual header controls.
+  Furigana (On/Tap/Off) and English (Show/Tap/Hide) follow the usual header controls, and both
+  work sentence by sentence: **Show** interleaves each sentence with its own translation as a
+  parallel text, **Tap** reveals one line at a time, **Hide** leaves continuous Japanese prose.
 - **Browse** — a grid of every kanji with search across kanji, readings, meanings,
   vocabulary and sentences. Search always looks at every level: if matches fall outside
   the level you're filtered to, it says how many and offers to show them, so the filter
