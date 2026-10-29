@@ -3,7 +3,8 @@ import json, re, sys
 sys.path.insert(0, '/home/claude')
 from reading_data import PASSAGES as _P1
 from reading_n2 import PASSAGES as _P2
-PASSAGES = _P1 + _P2
+from reading_n2b import PASSAGES as _P3
+PASSAGES = _P1 + _P2 + _P3
 from furigana import full_furigana
 KAN = re.compile(r'[一-鿿々]')
 
