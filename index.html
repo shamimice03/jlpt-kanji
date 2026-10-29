@@ -186,6 +186,22 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
 .tile i.b3{background:var(--moss)}
 .empty{margin-top:24px;text-align:center;color:var(--faint);font-size:0.875rem}
 
+/* reading */
+.rpara{font-family:var(--jp);font-size:1.0625rem;line-height:2.15;margin:0 0 14px;text-align:justify}
+.rtitle{font-family:var(--mincho);font-size:1.375rem;font-weight:700;margin:0 0 4px}
+.rmeta{font-size:0.6875rem;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 18px}
+.rbadge{font-size:0.625rem;font-weight:700;padding:1px 6px;border-radius:4px;color:#fff;margin-right:8px;letter-spacing:.04em;display:inline-block}
+.rbadge.N5{background:#3F7F8C}.rbadge.N4{background:#7B61A8}
+.rbadge.N3{background:var(--moss)}.rbadge.N2{background:var(--indigo)}
+.rtrans{border-top:1px solid var(--line-soft);margin-top:4px;padding-top:14px}
+.rtrans p{font-size:0.875rem;color:var(--muted);line-height:1.75;margin:0}
+.rq{border-top:1px solid var(--line-soft);margin-top:18px;padding-top:16px}
+.rq h3{font-family:var(--jp);font-size:1rem;margin:0 0 10px;font-weight:500}
+.rq h3 b{font-size:0.6875rem;font-weight:700;color:var(--indigo-ink);background:var(--indigo);
+  border-radius:4px;padding:1px 6px;margin-right:8px;font-family:var(--ui);vertical-align:2px}
+.rwhy{font-family:var(--jp);font-size:0.875rem;line-height:1.85;margin:10px 0 0;padding:10px 12px;
+  border-radius:8px;background:var(--surface-2);color:var(--muted)}
+
 /* quiz options */
 .opts{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .opt{font:inherit;font-size:0.9375rem;text-align:left;display:flex;align-items:baseline;gap:10px;
@@ -295,6 +311,7 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
         <button role="tab" id="t-study" aria-selected="true">Kanji</button>
         <button role="tab" id="t-vocab" aria-selected="false">Vocab</button>
         <button role="tab" id="t-quiz" aria-selected="false">Review</button>
+        <button role="tab" id="t-read" aria-selected="false">Read</button>
         <button role="tab" id="t-browse" aria-selected="false">Browse</button>
       </div>
     </div>
@@ -408,6 +425,22 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
       <b>Mixed revision.</b> Random questions built from what you've marked <b>Got it</b> — kanji
       meanings and readings, word readings and meanings, and fill-in-the-blank sentences, shuffled
       together. Wrong answers knock that item back a box so it returns in the Kanji and Vocab decks.
+    </div>
+  </div>
+
+  <div id="read" hidden>
+    <div class="deckbar">
+      <select id="rsel" aria-label="Choose a passage"></select>
+      <button class="chip" id="rprev">←</button>
+      <button class="chip" id="rnext">→</button>
+      <span class="stat" id="rinfo"></span>
+    </div>
+    <div id="rstage"></div>
+    <div class="note">
+      <b>Graded reading.</b> Each passage uses only kanji at or below its level — checked
+      automatically, so an N3 passage can never slip in an N2 character. Furigana and the English
+      translation follow the controls above; hide both and read it cold, then check yourself with
+      the questions, which use the same formats as the exam's 読解 section.
     </div>
   </div>
 
@@ -1280,8 +1313,63 @@ $('unlink').onclick = async () => {
   } catch(e){ showLink('stale', handle.name); }
 })();
 
+/* ---------- graded reading ---------- */
+const READ = [{"id":"r1","t":"N5","ti":"にちようび","p":[[["にちようび、わたしは",null],["父","ちち"],["と",null],["母","はは"],["と",null],["山","やま"],["へ",null],["行","い"],["きました。",null]],[["あさはやくうちを",null],["出","で"],["て、",null],["電車","でんしゃ"],["に",null],["一","いち"],["時間","じかん"],["ほどのりました。",null]],[["山","やま"],["の",null],["上","うえ"],["から、",null],["川","かわ"],["と",null],["小","ちい"],["さなまちが",null],["見","み"],["えました。そらが",null],["高","たか"],["くて、",null],["気","き"],["もちがよかったです。",null]],[["おひるは、",null],["母","はは"],["のおべんとうを",null],["食","た"],["べました。とてもおいしかったです。",null]],[["また",null],["三","さん"],["人","にん"],["で",null],["行","い"],["きたいです。",null]]],"en":"On Sunday I went to the mountains with my father and mother. We left home early in the morning and rode the train for about an hour. From the top of the mountain we could see a river and a small town. The sky was high and it felt wonderful. For lunch we ate the packed lunch my mother had made. It was delicious. I want to go again, the three of us.","q":[{"q":"だれと山へ行きましたか。","o":["友だちと","父と母と","先生と","一人で"],"a":1,"w":"「わたしは父と母と山へ行きました」とあります。"},{"q":"山の上から何が見えましたか。","o":["うみとふね","川とまち","電車とえき","学校とうち"],"a":1,"w":"「川と小さな、まちが見えました」とあります。"}]},{"id":"r2","t":"N4","ti":"となりのせきの人","p":[[["四","よん"],["月","がつ"],["に",null],["新","あたら"],["しい",null],["学校","がっこう"],["に",null],["来","き"],["ました。はじめは",null],["知","し"],["っている",null],["人","ひと"],["が",null],["一人","ひとり"],["もいなくて、",null],["少","すこ"],["しさびしかったです。",null]],[["ある",null],["日","ひ"],["、となりのせきの",null],["人","ひと"],["が「いっしょにお",null],["昼","ひる"],["を",null],["食","た"],["べませんか」と",null],["言","い"],["ってくれました。わたしはうれしくて、すぐに「はい」と",null],["答","こた"],["えました。",null]],[["その",null],["日","ひ"],["から",null],["毎日","まいにち"],["いっしょに",null],["食","た"],["べています。",null],["話","はなし"],["をしているうちに、",null],["同","おな"],["じ",null],["音楽","おんがく"],["がすきだと",null],["分","わ"],["かりました。",null]],[["今","いま"],["は、",null],["学校","がっこう"],["へ",null],["行","い"],["くのが",null],["楽","たの"],["しみです。",null]]],"en":"In April I came to a new school. At first I did not know a single person and felt a little lonely. One day the person sitting next to me said, “Would you like to have lunch together?” I was so glad that I answered “yes” straight away. Since that day we have eaten together every day. While talking, we found we like the same music. Now I look forward to going to school.","q":[{"q":"はじめ、どうしてさびしかったのですか。","o":["学校がとおかったから","知っている人がいなかったから","勉強がむずかしかったから","お昼を食べられなかったから"],"a":1,"w":"「知っている人が一人もいなくて、少しさびしかった」とあります。"},{"q":"今、学校へ行くのが楽しみなのはなぜですか。","o":["新しい音楽を教えてもらえるから","いっしょに食べる友だちができたから","となりのせきがかわったから","勉強がかんたんになったから"],"a":1,"w":"いっしょにお昼を食べる人ができ、好きなものも同じだと分かったからです。"}]},{"id":"r3","t":"N3","ti":"となりの部屋の犬","p":[[["となりの",null],["部屋","へや"],["に、",null],["犬","いぬ"],["をかっている",null],["人","ひと"],["が",null],["住","す"],["んでいる。",null]],[["引","ひ"],["っこしてきた",null],["日","ひ"],["、ドアの",null],["前","まえ"],["でその",null],["犬","いぬ"],["に",null],["会","あ"],["った。",null],["思","おも"],["ったより",null],["大","おお"],["きかったので、わたしは",null],["少","すこ"],["しこわかった。しかし、かい",null],["主","ぬし"],["の",null],["女","おんな"],["の",null],["人","ひと"],["が「だいじょうぶですよ。やさしい",null],["子","こ"],["ですから」と",null],["言","い"],["って、わたしの",null],["手","て"],["を",null],["犬","いぬ"],["のはなの",null],["近","ちか"],["くへ",null],["持","も"],["っていった。",null],["犬","いぬ"],["はしずかに",null],["手","て"],["のにおいをかいで、しっぽをふった。",null]],[["それから",null],["毎朝","まいあさ"],["、",null],["出","で"],["かける",null],["前","まえ"],["にその",null],["犬","いぬ"],["にあいさつするようになった。",null],["名前","なまえ"],["はハナという。",null]],[["ある",null],["日","ひ"],["、",null],["仕事","しごと"],["でつかれて",null],["帰","かえ"],["ってきたとき、ハナがドアの",null],["前","まえ"],["にすわって",null],["待","ま"],["っていた。わたしの",null],["顔","かお"],["を",null],["見","み"],["ると、うれしそうに",null],["走","はし"],["ってきた。その",null],["日","ひ"],["のつかれが、",null],["急","きゅう"],["にかるくなった",null],["気","き"],["がした。",null]]],"en":"Someone who keeps a dog lives in the room next door. On the day I moved in I met the dog in front of the door. It was bigger than I had expected, so I was a little afraid. But its owner said, “It's all right, she's gentle,” and brought my hand close to the dog's nose. The dog quietly sniffed my hand and wagged her tail. After that I began greeting her every morning before going out. Her name is Hana. One day, when I came home tired from work, Hana was sitting waiting in front of the door. When she saw my face she came running happily. My tiredness that day suddenly felt lighter.","q":[{"q":"はじめて犬に会ったとき、わたしはどう思ったか。","o":["かわいいと思った","少しこわいと思った","うるさいと思った","きたないと思った"],"a":1,"w":"「思ったより大きかったので、わたしは少しこわかった」とあります。"},{"q":"「つかれが急にかるくなった気がした」のはなぜか。","o":["仕事が思ったより早く終わったから","ハナがよろこんでむかえてくれたから","ドアの前でしばらく休んだから","かい主が手つだってくれたから"],"a":1,"w":"待っていたハナがうれしそうに走ってきたことで、気もちが軽くなったのです。"}]},{"id":"r4","t":"N3","ti":"本の読み方","p":[[["本","ほん"],["は",null],["速","はや"],["く",null],["読","よ"],["むほうがよいと",null],["思","おも"],["っていた",null],["時期","じき"],["がある。",null],["一","いち"],["年","ねん"],["に",null],["何","なん"],["さつ",null],["読","よ"],["んだかを",null],["数","かぞ"],["えて、",null],["多","おお"],["ければ",null],["多","おお"],["いほどよいと",null],["考","かんが"],["えていた。",null]],[["しかし、",null],["去年","きょねん"],["の",null],["冬","ふゆ"],["に",null],["病気","びょうき"],["で",null],["一","いち"],["週間","しゅうかん"],["ほど",null],["休","やす"],["んだとき、その",null],["考","かんが"],["えがかわった。ほかにすることがなく、",null],["同","おな"],["じ",null],["本","ほん"],["を",null],["何","なん"],["度","ど"],["もくり",null],["返","かえ"],["し",null],["読","よ"],["んだ。すると、",null],["一","いち"],["度","ど"],["目","め"],["には",null],["気","き"],["づかなかった",null],["言葉","ことば"],["が、",null],["二","に"],["度","ど"],["目","め"],["、",null],["三","さん"],["度","ど"],["目","め"],["には",null],["見","み"],["えてきた。",null],["同","おな"],["じ",null],["文","ぶん"],["なのに、",null],["読","よ"],["むたびに",null],["感","かん"],["じることがちがうのだ。",null]],[["今","いま"],["は、さつ",null],["数","かず"],["を",null],["数","かぞ"],["えるのをやめた。",null],["速","はや"],["く",null],["読","よ"],["むことより、",null],["心","こころ"],["に",null],["残","のこ"],["る",null],["一行","いっこう"],["に",null],["出会","であ"],["うことのほうが、ずっと",null],["大切","たいせつ"],["だと",null],["思","おも"],["うようになったからだ。",null]]],"en":"There was a time when I thought it was better to read quickly. I counted how many books I read in a year and believed the more the better. But last winter, when I was ill and rested for about a week, that view changed. With nothing else to do, I read the same book over and over. Words I had not noticed the first time became visible on the second and third readings. It is the same text, yet what I feel differs each time I read it. Now I have stopped counting. I have come to think that meeting a single line that stays in your heart matters far more than reading fast.","q":[{"q":"この文を書いた人は、以前どのように考えていたか。","o":["本はゆっくり読むほうがよい","読んだ本の数が多いほどよい","むずかしい本を読むほうがよい","同じ本を何度も読むほうがよい"],"a":1,"w":"「多ければ多いほどよいと考えていた」とあります。"},{"q":"この文を書いた人の、今の考えに合うものはどれか。","o":["一年に読むさつ数を決めたほうがよい","病気のときに読むとよく分かる","心に残る言葉に出会うことが大切だ","速く読むれんしゅうをしたほうがよい"],"a":2,"w":"「心に残る一行に出会うことのほうが、ずっと大切だ」とあります。"}]},{"id":"r5","t":"N2","ti":"便利さと引きかえに","p":[[["最近","さいきん"],["は、",null],["電話","でんわ"],["一","ひと"],["つで",null],["何","なん"],["でもできるようになった。",null],["道","みち"],["に",null],["迷","まよ"],["えば",null],["地図","ちず"],["が",null],["教","おし"],["えてくれるし、",null],["知","し"],["らない",null],["言葉","ことば"],["もその",null],["場","ば"],["で",null],["調","しら"],["べられる。たしかに",null],["便利","べんり"],["である。",null]],[["しかし、",null],["便利","べんり"],["になった",null],["分","ぶん"],["、",null],["失","うしな"],["ったものもあるのではないか。",null]],[["以前","いぜん"],["なら、",null],["駅","えき"],["までの",null],["道","みち"],["を",null],["人","ひと"],["にたずねた。",null],["相手","あいて"],["の",null],["顔","かお"],["を",null],["見","み"],["て、",null],["礼","れい"],["を",null],["言","い"],["った。",null],["今","いま"],["はその",null],["必要","ひつよう"],["がない。",null],["画面","がめん"],["を",null],["見","み"],["ながら",null],["歩","ある"],["いていれば、",null],["目的","もくてき"],["地","ち"],["に",null],["着","つ"],["く。",null],["早","はや"],["くはなったが、そこに",null],["人","ひと"],["との",null],["関","かか"],["わりはない。",null]],[["①そのことに",null],["気","き"],["づいたのは、",null],["祖母","そぼ"],["と",null],["旅行","りょこう"],["したときだった。",null],["祖母","そぼ"],["は",null],["電話","でんわ"],["を",null],["持ち歩","もちある"],["かない。",null],["道","みち"],["が",null],["分","わ"],["からなくなると、",null],["近","ちか"],["くの",null],["店","みせ"],["に",null],["入","はい"],["ってたずねる。すると",null],["店","みせ"],["の",null],["人","ひと"],["が、",null],["地図","ちず"],["にのっていない",null],["近道","ちかみち"],["を",null],["教","おし"],["えてくれたり、",null],["安","やす"],["くておいしい",null],["店","みせ"],["をすすめてくれたりする。わたしが",null],["調","しら"],["べて",null],["得","え"],["た",null],["情報","じょうほう"],["より、ずっと",null],["豊","ゆた"],["かだった。",null]],[["便利","べんり"],["な",null],["道具","どうぐ"],["を",null],["捨","す"],["てる",null],["必要","ひつよう"],["はない。ただ、それに",null],["頼","たよ"],["りきってしまうと、",null],["本当","ほんとう"],["は",null],["手","て"],["に",null],["入","はい"],["るはずだったものを",null],["見落","みお"],["としてしまうのかもしれない。",null]]],"en":"These days you can do almost anything with a phone. If you lose your way, a map tells you; a word you do not know can be looked up on the spot. It is certainly convenient. But for all that convenience, is there not something we have lost? Once, you asked someone the way to the station. You looked at their face and thanked them. Now there is no need. Walk while watching the screen and you arrive. It is faster, but there is no contact with another person in it. I noticed this while travelling with my grandmother. She does not carry a phone. When she loses her way she goes into a nearby shop and asks. The shopkeeper then tells her a shortcut not on any map, or recommends somewhere cheap and good to eat. It was far richer than the information I got by looking things up. There is no need to throw the convenient tools away. But if we come to rely on them entirely, we may overlook what we could in fact have had.","q":[{"q":"①そのこと とは、どんなことか。","o":["電話一つで何でも調べられるということ","便利になったかわりに失ったものがあるということ","祖母が電話を持ち歩かないということ","店の人が近道を教えてくれるということ"],"a":1,"w":"直前の段落で「便利になった分、失ったものもあるのではないか」と述べ、人との関わりが失われた例を挙げています。"},{"q":"祖母の旅について、筆者はどう感じているか。","o":["道に迷うので時間がかかって困る","人にたずねるのは相手にめいわくだ","調べて得た情報よりも中身が豊かだ","若い人にはまねができない方法だ"],"a":2,"w":"「わたしが調べて得た情報より、ずっと豊かだった」とあります。"},{"q":"筆者が最も言いたいことは何か。","o":["便利な道具はできるだけ使わないほうがよい","人にたずねるほうが調べるより早い","便利な道具に頼りきると、得られたはずのものを見落とす","祖母のような昔の生活にもどるべきだ"],"a":2,"w":"最後の段落で「捨てる必要はない。ただ、頼りきってしまうと…見落としてしまう」と述べています。1や4のように道具を否定してはいません。"}]},{"id":"r6","t":"N2","ti":"失敗から学ぶ","p":[[["子","こ"],["どものころ、",null],["失敗","しっぱい"],["するのがこわかった。",null],["手","て"],["をあげて",null],["答","こた"],["えを",null],["間違","まちが"],["えると、はずかしかったからだ。だから、",null],["確実","かくじつ"],["に",null],["分","わ"],["かる",null],["問題","もんだい"],["にしか",null],["手","て"],["をあげなかった。",null]],[["働","はたら"],["きはじめてから、その",null],["考","かんが"],["えが",null],["変","か"],["わった。",null],["新","あたら"],["しい",null],["仕事","しごと"],["を",null],["任","まか"],["されたとき、わたしは",null],["一","いち"],["度","ど"],["も",null],["失敗","しっぱい"],["しないように、",null],["何","なん"],["度","ど"],["も",null],["確認","かくにん"],["しながら、しんちょうに",null],["進","すす"],["めた。しかし",null],["結果","けっか"],["は、",null],["期待","きたい"],["したほどよくなかった。",null]],[["となりの",null],["席","せき"],["の",null],["同期","どうき"],["は、わたしとはちがった。",null],["思","おも"],["いついたらすぐ",null],["試","ため"],["し、うまくいかないと",null],["分","わ"],["かればすぐにやり",null],["方","かた"],["を",null],["変","か"],["える。",null],["失敗","しっぱい"],["の",null],["数","かず"],["はわたしよりずっと",null],["多","おお"],["かったが、",null],["最後","さいご"],["にはよい",null],["結果","けっか"],["を",null],["出","だ"],["した。",null]],[["②その",null],["差","さ"],["はどこにあったのだろう。わたしは",null],["失敗","しっぱい"],["を「さけるもの」と",null],["考","かんが"],["え、",null],["彼","かれ"],["は「",null],["早","はや"],["く",null],["見","み"],["つけるもの」と",null],["考","かんが"],["えていた。",null],["大切","たいせつ"],["なのは",null],["失敗","しっぱい"],["の",null],["数","かず"],["ではなく、そこから",null],["何","なん"],["を",null],["学","まな"],["び、どれだけ",null],["早","はや"],["く",null],["次","つぎ"],["に",null],["生","い"],["かすかなのだと、そのとき",null],["初","はじ"],["めて",null],["気","き"],["づいた。",null]]],"en":"As a child I was afraid of failing. If I raised my hand and got the answer wrong, it was embarrassing. So I only raised my hand for questions I was certain about. After I started working, that view changed. When I was given a new job, I went about it carefully, checking over and over so as never to fail once. But the result was not as good as I had hoped. The colleague who joined at the same time, sitting next to me, was different. She tried things as soon as she thought of them, and changed her approach the moment she saw it was not working. She failed far more often than I did, yet in the end she produced the better result. Where did that difference lie? I thought of failure as something to avoid; she thought of it as something to find early. What matters is not the number of failures but what you learn from them and how quickly you put it to use. That was when I first realised it.","q":[{"q":"②その差 とは、何と何の差か。","o":["仕事の量の差","失敗に対する考え方の差","経験の長さの差","性格の明るさの差"],"a":1,"w":"直後に「わたしは失敗を『さけるもの』と考え、彼は『早く見つけるもの』と考えていた」と説明されています。"},{"q":"筆者は新しい仕事をどのように進めたか。","o":["思いついたことをすぐに試した","同期にやり方を聞きながら進めた","失敗しないように何度も確認した","期待されたとおりの結果を出した"],"a":2,"w":"「一度も失敗しないように、何度も確認しながら慎重に進めた」とあります。"},{"q":"筆者が最も言いたいことは何か。","o":["失敗はできるだけさけるべきだ","失敗の数が多いほうがよい結果が出る","失敗から学び、早く次に生かすことが大切だ","子どものころの考え方は変えないほうがよい"],"a":2,"w":"最後に「大切なのは失敗の数ではなく、そこから何を学び、どれだけ早く次に生かすか」とまとめています。2は「数が多いほうがよい」と言っており誤りです。"}]}];
+let rIdx = 0, rShown = {};
+
+function rrender(){
+  const d = READ[rIdx];
+  $('rsel').value = rIdx;
+  $('rinfo').textContent = `${rIdx+1} / ${READ.length}`;
+  const paras = d.p.map(runs => `<p class="rpara">${rubyRuns(runs)}</p>`).join('');
+  const qs = d.q.map((q, i) => {
+    const picked = (rShown[d.id] || {})[i];
+    const opts = q.o.map((o, j) => {
+      let cls = 'opt jpopt';
+      if (picked !== undefined){
+        if (j === q.a) cls += ' right';
+        else if (j === picked) cls += ' wrong';
+      }
+      return `<button class="${cls}" data-q="${i}" data-o="${j}"${picked !== undefined ? ' disabled' : ''}>`
+           + `<b>${j+1}</b>${esc(o)}</button>`;
+    }).join('');
+    return `<div class="rq"><h3><b>${i+1}</b>${esc(q.q)}</h3><div class="opts">${opts}</div>`
+         + (picked !== undefined ? `<p class="rwhy">${picked === q.a ? '正解。' : '不正解。'}${esc(q.w)}</p>` : '')
+         + `</div>`;
+  }).join('');
+  $('rstage').innerHTML = `
+    <div class="card"><div class="face">
+      <p class="rtitle">${esc(d.ti)}</p>
+      <p class="rmeta"><span class="rbadge ${d.t}">${d.t}</span>${d.p.reduce((n,r)=>n+r.reduce((m,x)=>m+x[0].length,0),0)} characters</p>
+      ${paras}
+      <div class="rtrans en"><p>${esc(d.en)}</p></div>
+      ${qs}
+    </div></div>
+    <div class="nav"><button class="lnk" data-rgo="-1">← Previous</button>
+      <span class="lnk">${d.t}</span>
+      <button class="lnk" data-rgo="1">Next →</button></div>`;
+  $('rstage').querySelectorAll('.opt:not([disabled])').forEach(b => b.onclick = () => {
+    (rShown[d.id] = rShown[d.id] || {})[+b.dataset.q] = +b.dataset.o;
+    try { localStorage.setItem('n2-read', JSON.stringify(rShown)); } catch(e){}
+    rrender();
+  });
+  $('rstage').querySelectorAll('[data-rgo]').forEach(b => b.onclick = () => rmove(+b.dataset.rgo));
+  hookRuby($('rstage'));
+}
+function rmove(d){
+  rIdx = (rIdx + d + READ.length) % READ.length;
+  try { localStorage.setItem('n2-readi', rIdx); } catch(e){}
+  rrender(); window.scrollTo({top:0, behavior:'smooth'});
+}
+$('rsel').innerHTML = READ.map((d,i) => `<option value="${i}">${d.t} · ${d.ti}</option>`).join('');
+$('rsel').onchange = e => { rIdx = +e.target.value; rrender(); };
+$('rprev').onclick = () => rmove(-1);
+$('rnext').onclick = () => rmove(1);
+try { rShown = JSON.parse(localStorage.getItem('n2-read') || '{}') || {}; } catch(e){ rShown = {}; }
+try { const i = +localStorage.getItem('n2-readi'); if (i >= 0 && i < READ.length) rIdx = i; } catch(e){}
+
 /* ---------- tabs ---------- */
-const VIEWS = ['study','vocab','quiz','browse'];
+const VIEWS = ['study','vocab','quiz','read','browse'];
 let view = 'study';
 function show(v){
   view = v;
@@ -1289,11 +1377,13 @@ function show(v){
   if (v === 'browse') renderBrowse($('q').value);
   if (v === 'vocab' && !vorder.length) buildVDeck();
   if (v === 'quiz'  && !qList.length)  buildQuiz();
+  if (v === 'read') rrender();
   updateStat();
 }
 $('t-study').onclick  = () => show('study');
 $('t-vocab').onclick  = () => show('vocab');
 $('t-quiz').onclick   = () => show('quiz');
+$('t-read').onclick   = () => show('read');
 $('t-browse').onclick = () => show('browse');
 
 /* the Words filter changes which words are in the vocabulary deck, so rebuild it */

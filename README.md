@@ -40,6 +40,10 @@ Each kanji has:
   on'yomi, word → reading, word → meaning, meaning → word, and fill-in-the-blank from the
   example sentences. A wrong answer knocks that item back a Leitner box, so it returns in
   the Kanji and Vocab decks.
+- **Read** — graded reading passages with comprehension questions in the exam's 読解 formats
+  (指示語, 内容理解, 主張理解). Every passage is restricted to kanji at or below its level, and
+  `reading_check.py` enforces that — an N3 passage cannot contain an N2 character. Furigana and
+  the English translation follow the usual controls, so you can read cold and then check.
 - **Browse** — a grid of every kanji with search across kanji, readings, meanings,
   vocabulary and sentences. Search always looks at every level: if matches fall outside
   the level you're filtered to, it says how many and offers to show them, so the filter
