@@ -192,3 +192,88 @@ SENT_EN["t6"] = [
  "Those of primary school age and under may not use the baths on their own.",
  "Please always come with an adult.",
 ]
+
+SENT_EN["u5"] = [
+ "Even if you decide to start saving, trying to save what is left over usually does not last.",
+ "That is because at the end of the month there is usually nothing left over.",
+ "People who manage it do it the other way round.",
+ "On the day their pay comes in, they move a set amount into another account first.",
+ "They then live on what remains \u2014 and oddly, it turns out to be enough.",
+ "Rather than trying to keep it up on willpower alone, building the arrangement at the start is in the end easier.",
+]
+SENT_EN["u8"] = [
+ "A",
+ "I think it is better to live in the city while you are young.",
+ "The range of work to choose from is wide, and there are many places to learn.",
+ "A gallery, an evening class \u2014 if you decide to go, you can go that same day.",
+ "Rent is high and rooms are small, but step outside and most of what you lack is there to be had.",
+ "That there are many options is itself significant when you are young.",
+ "B",
+ "The city certainly has everything.",
+ "But having something and using it are different.",
+ "There are plenty of people who have a gallery nearby and let a year pass without once going in.",
+ "You often hear of people who moved to the countryside and started walking in the hills precisely then.",
+ "Not what is there, but how much time is left to do anything.",
+ "Surely that is what to look at when deciding where to live.",
+]
+SENT_EN["u9"] = [
+ "At university I was in the drama society.",
+ "I joined wanting to act, but my body was stiff and my voice did not carry, and in the first year I was moved behind the scenes.",
+ "To be honest, it stung.",
+ "I was put in charge of the lighting.",
+ "Which lights to bring down, and how far, in which scene \u2014 you read the script closely and decide.",
+ "At first I simply moved my hands as instructed.",
+ "What changed things was the day I tried delaying a light by one second in a certain scene.",
+ "The time the actor stood there in silence grew very slightly longer.",
+ "That alone changed the air in the auditorium.",
+ "The sound of an indrawn breath reached me, backstage.",
+ "That was when I first understood.",
+ "It is not only the actors who make a performance.",
+ "The lights, the sound, the raising and lowering of the curtain.",
+ "Each of them changes how the watcher's mind moves.",
+ "The audience's eyes are on the actors, but the scene in front of those eyes is made together with the people behind.",
+ "I graduated and moved to a different job, but the experience has stayed with me.",
+ "In any setting there are people who stand at the front and people who support from out of sight.",
+ "And a small judgement by the one supporting can decide the impression of the whole.",
+ "Being noticed and having an effect are two different things.",
+]
+SENT_EN["u10"] = [
+ "Midori Inn \u2014 accommodation guide",
+ "\u25a0 Rooms and rates (per person, one night with two meals)",
+ "Please see the table below.",
+ "\u25a0 Children",
+ "Primary school children are half the adult rate; children of three and under are free.",
+ "(Children of three and under are not provided with meals or bedding.)",
+ "\u25a0 Meals",
+ "Dinner is from 6pm and breakfast from 7am.",
+ "If there are ingredients you dislike, please let us know at least three days in advance.",
+ "\u25a0 Changes and cancellations",
+ "Free up to the day before.",
+ "Cancellation on the day incurs 30% of the rate.",
+ "\u25a0 Transfers",
+ "Transfers between the station and the inn are free, but must be booked by the day before.",
+]
+
+SENT_EN["u2"] = [
+ "Telling people about a failure is embarrassing.",
+ "So most people keep quiet.",
+ "But when they keep quiet, the same failure happens again to someone else.",
+ "Thanks to the person who takes on a little of the shame and talks, the next person avoids the same loss.",
+ "Success stories are pleasant to listen to.",
+ "But what is genuinely useful is usually the story of a failure.",
+]
+SENT_EN["u3"] = [
+ "They say you should go to the shop in the evening when buying shoes.",
+ "That is because feet swell and are larger in the evening than in the morning.",
+ "If you choose to fit your morning size, they become tight by the end of the day and walking becomes painful.",
+ "A little room is in the end less tiring.",
+ "If you decide on looks alone, you end up with shoes you bought and then barely wore.",
+]
+SENT_EN["u4"] = [
+ "When someone is going to be late for a meeting, they sometimes say \u201cI'll be there in five minutes.\u201d",
+ "In fact it often takes fifteen.",
+ "The person running late wants to believe they will arrive soon.",
+ "That hope comes out of their mouth as a number.",
+ "What matters to the person waiting is not a small number but an accurate one.",
+ "If it is going to take fifteen minutes, being told fifteen at the outset means they can read a book or deal with something else.",
+]
