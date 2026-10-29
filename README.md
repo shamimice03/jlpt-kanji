@@ -40,9 +40,10 @@ Each kanji has:
   on'yomi, word → reading, word → meaning, meaning → word, and fill-in-the-blank from the
   example sentences. A wrong answer knocks that item back a Leitner box, so it returns in
   the Kanji and Vocab decks.
-- **Read** — 24 original passages (20 at N2, 46 questions) with comprehension questions,
+- **Read** — 30 original passages (26 at N2, 61 questions) with comprehension questions,
   covering all five shapes the 読解 section uses, in roughly the exam's own proportions
-  (短文 5, 中文 5, 長文 4, 統合理解 3, 情報検索 3): 内容理解（短文）, 内容理解（中文）, 統合理解 (paired A/B texts),
+  (中文 7, 短文 6, 長文 5, 統合理解 4, 情報検索 4). One 情報検索 page carries a real
+  price table, since searching a table is the skill that question type tests: 内容理解（短文）, 内容理解（中文）, 統合理解 (paired A/B texts),
   主張理解（長文）and 情報検索 (a notice you search rather than read). The passage list follows
   the Level menu, so "N2 only" shows only N2. Every passage is restricted to kanji at or below
   its level and `reading_check.py` enforces it — an N3 passage cannot contain an N2 character.

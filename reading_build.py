@@ -6,9 +6,10 @@ sys.path.insert(0, '/home/claude')
 from reading_data import PASSAGES as _P1
 from reading_n2   import PASSAGES as _P2
 from reading_n2b  import PASSAGES as _P3
+from reading_n2c  import PASSAGES as _P4
 from reading_sent_en import SENT_EN
 from furigana import full_furigana
-PASSAGES = _P1 + _P2 + _P3
+PASSAGES = _P1 + _P2 + _P3 + _P4
 KAN = re.compile(r'[一-鿿々]')
 
 def split_jp(line):
@@ -39,8 +40,13 @@ for p in PASSAGES:
                 problems.append(f"{p['id']}: furigana changed the text")
             row.append({"r": runs, "e": en[k]}); k += 1
         packed.append(row)
+    tb = p.get('table')
+    tbl = None
+    if tb:
+        tbl = {"head": [full_furigana(c) if c else [] for c in tb['head']],
+               "rows": [[full_furigana(c) for c in row] for row in tb['rows']]}
     out.append({"id": p['id'], "t": p['tier'], "ti": p['title'], "k": p.get('kind',''),
-                "p": packed, "en": p['en'],
+                "p": packed, "en": p['en'], "tb": tbl,
                 "q": [{"q": q['q'], "o": q['opts'], "a": q['ans'], "w": q['why']} for q in p['qs']]})
 
 json.dump(out, open('reading_packed.json','w',encoding='utf-8'), ensure_ascii=False, separators=(',',':'))
