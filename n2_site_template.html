@@ -1,0 +1,1559 @@
+<title>Kanji for JLPT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#EDF0F4; --surface:#FFFFFF; --surface-2:#F5F8FB; --surface-3:#E8EDF3;
+  --ink:#15202B; --muted:#5D6E80; --faint:#8496A6;
+  --line:#D3DBE4; --line-soft:#E4EAF0;
+  --indigo:#1E4E79; --indigo-ink:#FFFFFF; --indigo-soft:#E2EAF3;
+  --persimmon:#C0561F; --moss:#2E7A58;
+  --shadow:0 1px 2px rgba(21,32,43,.06),0 8px 24px -12px rgba(21,32,43,.18);
+  --jp:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --mincho:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --ui:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --paper:#0F151C; --surface:#19222C; --surface-2:#141D26; --surface-3:#202B37;
+  --ink:#E5EDF4; --muted:#8FA2B4; --faint:#6B7E90;
+  --line:#26323E; --line-soft:#1F2A35;
+  --indigo:#82B4E6; --indigo-ink:#0F151C; --indigo-soft:#1B2937;
+  --persimmon:#E08A4F; --moss:#5EC095;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#0F151C; --surface:#19222C; --surface-2:#141D26; --surface-3:#202B37;
+  --ink:#E5EDF4; --muted:#8FA2B4; --faint:#6B7E90;
+  --line:#26323E; --line-soft:#1F2A35;
+  --indigo:#82B4E6; --indigo-ink:#0F151C; --indigo-soft:#1B2937;
+  --persimmon:#E08A4F; --moss:#5EC095;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+/* Japanese text stays selectable even inside buttons, so it can be copied out to a dictionary */
+.opt,.opt *,.glyph,.jp,.rd span,ul.vocab .w,.tile,.gloss,.en{user-select:text;-webkit-user-select:text}
+
+/* ---- type scale: everything is rem, so one root size drives the whole page ---- */
+:root{font-size:100%; --colw:720px}
+/* auto-scale up on larger displays */
+@media (min-width:1000px){:root{font-size:106.25%; --colw:820px}}
+@media (min-width:1360px){:root{font-size:112.5%;  --colw:900px}}
+@media (min-width:1700px){:root{font-size:118.75%; --colw:980px}}
+/* manual override from the Text control (wins over the media queries) */
+:root[data-size="s"] {font-size:93.75%  !important}
+:root[data-size="m"] {font-size:106.25% !important}
+:root[data-size="l"] {font-size:118.75% !important}
+:root[data-size="xl"]{font-size:131.25% !important}
+
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:0.9375rem;line-height:1.55;-webkit-font-smoothing:antialiased;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+.wrap{max-width:var(--colw);margin:0 auto;padding-inline:16px;padding-block:0 48px}
+
+/* header */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft)}
+.bar-in{max-width:var(--colw);margin:0 auto;padding:9px 16px}
+.row1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--mincho);font-weight:700;font-size:1.125rem;white-space:nowrap;
+      background:none;border:0;padding:4px 6px;margin-left:-6px;color:var(--ink);cursor:pointer;border-radius:7px}
+.logo:hover{background:var(--surface-3)}
+.logo:focus-visible{outline:2px solid var(--indigo);outline-offset:1px}
+.logo small{font-family:var(--ui);font-weight:400;font-size:0.6875rem;color:var(--faint);letter-spacing:.07em;margin-left:6px}
+.homebtn{font:inherit;font-size:0.8125rem;font-weight:600;margin-left:auto;display:flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.homebtn:hover{border-color:var(--indigo);color:var(--indigo)}
+.homebtn:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.tabs{display:flex;gap:2px;background:var(--surface-3);border-radius:8px;padding:2px}
+.tabs button{font:inherit;font-size:0.8125rem;font-weight:500;padding:5px 13px;border:0;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.track{height:3px;background:var(--line-soft);border-radius:2px;margin-top:9px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--indigo);transition:width .3s ease}
+.ctrls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:9px}
+.ctrl{display:flex;align-items:center;gap:6px}
+.ctrl>span{font-size:0.6562rem;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.ctrl>span em{font-family:var(--jp);font-style:normal;letter-spacing:0;text-transform:none;opacity:.8;margin-left:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:0.75rem;padding:3px 9px;border:0;cursor:pointer;background:transparent;color:var(--muted);border-right:1px solid var(--line-soft)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--indigo);color:var(--indigo-ink);font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--persimmon);outline-offset:-2px}
+.stat{margin-left:auto;font-size:0.75rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin-top:18px;overflow:hidden}
+.face{padding:24px 22px}
+.prompt{display:flex;flex-direction:column;align-items:center;gap:14px;padding-block:20px}
+.glyph{font-family:var(--mincho);font-weight:500;line-height:1;font-size:clamp(5.25rem,25vw,8rem)}
+.glyph-sm{font-family:var(--mincho);font-size:2.75rem;line-height:1;font-weight:500}
+.hint{font-size:0.8125rem;color:var(--faint);text-align:center}
+.lv{display:inline-block;font-size:0.625rem;font-weight:700;letter-spacing:.06em;padding:1px 5px;border-radius:4px;background:var(--persimmon);color:#fff;vertical-align:2px;margin-left:5px}
+.lv.n3{background:var(--moss)}
+.lv.n4{background:#7B61A8}
+.lv.n5{background:#3F7F8C}
+.tile em{position:absolute;left:4px;bottom:3px;font-style:normal;font-size:0.5312rem;color:var(--persimmon);font-weight:700}
+.tile em.n3{color:var(--moss)}
+.tile em.n4{color:#7B61A8}
+.tile em.n5{color:#3F7F8C}
+.reveal{font:inherit;font-size:0.875rem;font-weight:600;cursor:pointer;padding:9px 26px;border-radius:999px;border:1px solid var(--indigo);background:var(--indigo);color:var(--indigo-ink)}
+.reveal:focus-visible{outline:2px solid var(--persimmon);outline-offset:2px}
+.head{display:flex;align-items:center;gap:16px;padding-bottom:15px;border-bottom:1px solid var(--line-soft)}
+.readings{display:flex;flex-direction:column;gap:5px;min-width:0}
+.rd{display:flex;gap:9px;align-items:baseline}
+.rd b{font-family:var(--jp);font-size:0.6875rem;font-weight:700;color:var(--indigo-ink);background:var(--indigo);border-radius:4px;padding:1px 5px;flex:none}
+.rd b.kun{background:var(--persimmon);color:#fff}
+.rd span{font-family:var(--jp);font-size:1rem;word-break:break-all}
+.gloss{margin-top:9px;font-size:0.875rem;color:var(--muted)}
+.sec{margin-top:18px}
+.sec>h2{margin:0 0 9px;font-size:0.6562rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.sec>h2 em{font-style:normal;font-family:var(--jp);letter-spacing:.02em;text-transform:none;font-size:0.75rem}
+ul.vocab{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+ul.vocab li{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:7px 10px;border-radius:7px;background:var(--surface-2)}
+ul.vocab .w{font-family:var(--jp);font-size:1.0625rem;font-weight:500}
+ul.vocab .en{font-size:0.8125rem;color:var(--muted);margin-left:auto;text-align:right}
+.wl{font-size:0.5938rem;font-weight:700;letter-spacing:.05em;padding:1px 4px;border-radius:3px;
+    border:1px solid var(--line);color:var(--faint);flex:none;font-variant-numeric:tabular-nums}
+.wl.w5{border-color:color-mix(in srgb,#3F7F8C 55%,var(--line));color:#3F7F8C}
+.wl.w4{border-color:color-mix(in srgb,#7B61A8 55%,var(--line));color:#7B61A8}
+.wl.w3{border-color:color-mix(in srgb,var(--moss) 55%,var(--line));color:var(--moss)}
+.wl.w2{border-color:color-mix(in srgb,var(--indigo) 55%,var(--line));color:var(--indigo)}
+.wl.w1{border-color:color-mix(in srgb,var(--persimmon) 55%,var(--line));color:var(--persimmon)}
+.wl.none{border-style:dashed;color:var(--faint);opacity:.7;letter-spacing:0}
+[data-wl="hide"] ul.vocab li.over,[data-wl="hide"] ol.sents li.over{display:none}
+[data-onlywhenhidden]{display:none}
+[data-wl="hide"] [data-onlywhenhidden]{display:block}
+ol.sents{list-style:none;margin:0;padding:0;counter-reset:s;display:flex;flex-direction:column;gap:11px}
+ol.sents li{counter-increment:s;padding-left:25px;position:relative}
+ol.sents li::before{content:counter(s);position:absolute;left:0;top:4px;font-size:0.6562rem;color:var(--faint);font-variant-numeric:tabular-nums;width:17px;height:17px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;line-height:1}
+.jp{font-family:var(--jp);font-size:1.0625rem;line-height:2.05}
+.en{font-size:0.8438rem;color:var(--muted);margin-top:2px}
+
+/* furigana */
+ruby{ruby-position:over;-webkit-ruby-position:before}
+rt{font-family:var(--jp);font-size:.52em;font-weight:400;color:var(--indigo);transition:opacity .16s ease}
+/* Off collapses the ruby so prose flows normally; Tap keeps the space reserved
+   so the line does not jump when a reading is revealed. */
+[data-furi="off"] rt{display:none}
+[data-furi="hover"] rt{opacity:0}
+[data-furi="hover"] .jp ruby,[data-furi="hover"] .w ruby{cursor:pointer;border-bottom:1px dotted var(--line)}
+[data-furi="hover"] ruby:hover rt,[data-furi="hover"] ruby.on rt{opacity:1}
+[data-trans="off"] .en{display:none}
+[data-trans="tap"] .en{display:none}
+[data-trans="tap"] .en.on{display:block}
+[data-trans="tap"] .jp{cursor:pointer}
+
+/* reading: a sentence carries its own English, so the two can be interleaved */
+.rs .en{display:none}
+.rs .jp{display:inline;font-size:inherit;line-height:inherit}
+[data-trans="on"] .rs{display:block;margin:0 0 13px}
+[data-trans="on"] .rs .en{display:block;font-size:0.8125rem;line-height:1.7;margin-top:1px;
+  font-family:var(--ui);color:var(--muted)}
+[data-trans="tap"] .rs{cursor:pointer}
+[data-trans="tap"] .rs.open{display:block;margin:0 0 13px}
+[data-trans="tap"] .rs.open .en{display:block;font-size:0.8125rem;line-height:1.7;margin-top:1px;
+  font-family:var(--ui);color:var(--muted)}
+
+/* footer buttons */
+.foot{display:flex;gap:10px;margin-top:16px}
+.btn{font:inherit;font-size:0.875rem;font-weight:600;cursor:pointer;flex:1;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn.again{border-color:color-mix(in srgb,var(--persimmon) 45%,var(--line));color:var(--persimmon)}
+.btn.good{border-color:color-mix(in srgb,var(--moss) 45%,var(--line));color:var(--moss)}
+.btn:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.nav{display:flex;justify-content:space-between;margin-top:10px}
+.lnk{font:inherit;font-size:0.8125rem;background:none;border:0;cursor:pointer;color:var(--muted);padding:6px 4px}
+.lnk:hover{color:var(--indigo)}
+.lnk:focus-visible{outline:2px solid var(--indigo);outline-offset:2px;border-radius:4px}
+.keys{margin-top:16px;font-size:0.75rem;color:var(--faint);text-align:center;line-height:1.9}
+kbd{font-family:var(--ui);font-size:0.6875rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--muted);background:var(--surface)}
+
+/* deck picker */
+.deckbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.ctrls select{font-size:0.75rem;padding:4px 6px;border-radius:7px}
+select,input[type=search]{font:inherit;font-size:0.8438rem;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+input[type=search]{width:100%}
+select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:1px}
+.chip{font:inherit;font-size:0.7812rem;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--indigo);color:var(--indigo-ink);border-color:var(--indigo);font-weight:600}
+
+/* browse grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:7px;margin-top:14px}
+.tile{position:relative;aspect-ratio:1;display:grid;place-items:center;font-family:var(--mincho);font-size:1.625rem;background:var(--surface);border:1px solid var(--line);border-radius:9px;cursor:pointer;color:var(--ink);padding:0}
+.tile:hover{border-color:var(--indigo)}
+.tile:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.tile i{position:absolute;right:4px;top:4px;width:6px;height:6px;border-radius:50%}
+.tile i.b1{background:var(--persimmon)}
+.tile i.b2{background:#D9A441}
+.tile i.b3{background:var(--moss)}
+.empty{margin-top:24px;text-align:center;color:var(--faint);font-size:0.875rem}
+
+/* reading */
+.rpara{font-family:var(--jp);font-size:1.0625rem;line-height:2.15;margin:0 0 14px;text-align:justify}
+.rtitle{font-family:var(--mincho);font-size:1.375rem;font-weight:700;margin:0 0 4px}
+.rkind{font-family:var(--jp);letter-spacing:.02em;text-transform:none;color:var(--indigo)}
+.rmeta{font-size:0.6875rem;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 18px}
+.rbadge{font-size:0.625rem;font-weight:700;padding:1px 6px;border-radius:4px;color:#fff;margin-right:8px;letter-spacing:.04em;display:inline-block}
+.rbadge.N5{background:#3F7F8C}.rbadge.N4{background:#7B61A8}
+.rbadge.N3{background:var(--moss)}.rbadge.N2{background:var(--indigo)}
+.rtrans{border-top:1px solid var(--line-soft);margin-top:4px;padding-top:14px}
+.rtrans p{font-size:0.875rem;color:var(--muted);line-height:1.75;margin:0}
+.rq{border-top:1px solid var(--line-soft);margin-top:18px;padding-top:16px}
+.rq h3{font-family:var(--jp);font-size:1rem;margin:0 0 10px;font-weight:500}
+.rq h3 b{font-size:0.6875rem;font-weight:700;color:var(--indigo-ink);background:var(--indigo);
+  border-radius:4px;padding:1px 6px;margin-right:8px;font-family:var(--ui);vertical-align:2px}
+.rwhy{font-family:var(--jp);font-size:0.875rem;line-height:1.85;margin:10px 0 0;padding:10px 12px;
+  border-radius:8px;background:var(--surface-2);color:var(--muted)}
+
+.rtab{width:100%;border-collapse:collapse;margin:4px 0 16px;font-family:var(--jp);font-size:0.9375rem}
+.rtab th,.rtab td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+.rtab th{background:var(--surface-2);font-weight:600;font-size:0.875rem}
+.rtab td:not(:first-child),.rtab th:not(:first-child){text-align:center}
+@media (max-width:480px){.rtab th,.rtab td{padding:6px 6px;font-size:0.875rem}}
+
+/* quiz options */
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.opt{font:inherit;font-size:0.9375rem;text-align:left;display:flex;align-items:baseline;gap:10px;
+  padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink);cursor:pointer;transition:border-color .12s ease,background .12s ease}
+.opt.jpopt{font-family:var(--jp);font-size:1.0625rem}
+.opt b{font-size:0.6875rem;font-weight:700;color:var(--faint);border:1px solid var(--line);
+  border-radius:4px;padding:0 5px;flex:none;font-family:var(--ui)}
+.opt:not(:disabled):hover{border-color:var(--indigo);background:var(--indigo-soft)}
+.opt:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.opt:disabled{cursor:default;opacity:.62}
+.opt.right{opacity:1;border-color:var(--moss);background:color-mix(in srgb,var(--moss) 12%,transparent);color:var(--ink)}
+.opt.right b{border-color:var(--moss);color:var(--moss)}
+.opt.wrong{opacity:1;border-color:var(--persimmon);background:color-mix(in srgb,var(--persimmon) 10%,transparent)}
+.opt.wrong b{border-color:var(--persimmon);color:var(--persimmon)}
+
+.datarow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line-soft)}
+.dlabel{font-size:0.6562rem;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;margin-right:4px}
+.dlabel em{font-family:var(--jp);font-style:normal;letter-spacing:0;text-transform:none;opacity:.8}
+.dmsg{font-size:0.75rem;color:var(--moss);margin-left:4px}
+.dmsg.err{color:var(--persimmon)}
+.dsep{width:1px;height:18px;background:var(--line);margin:0 4px}
+.dfile{font-size:0.75rem;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.dfile b{font-weight:600;color:var(--ink)}
+.dfile i{width:7px;height:7px;border-radius:50%;background:var(--moss);font-style:normal;flex:none}
+.dfile i.warn{background:#D9A441}
+.dnote{font-size:0.75rem;color:var(--faint);line-height:1.7;margin:8px 0 0}
+
+/* word meaning bubble (Meaning: On) */
+#gtip{position:fixed;z-index:50;max-width:min(300px,calc(100vw - 16px));
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  box-shadow:var(--shadow);padding:8px 11px;cursor:pointer;
+  opacity:0;pointer-events:none;transform:translateY(-3px);transition:opacity .13s ease,transform .13s ease}
+#gtip.show{opacity:1;pointer-events:auto;transform:none}
+#gtip b{display:block;font-family:var(--jp);font-size:1rem;font-weight:500;color:var(--ink);line-height:1.4}
+#gtip span{display:block;font-size:0.8125rem;color:var(--muted);line-height:1.5;margin-top:1px}
+
+/* back to top */
+#toTop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;
+  width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink);font-size:1.125rem;line-height:1;cursor:pointer;box-shadow:var(--shadow);
+  opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .18s ease,transform .18s ease}
+#toTop.show{opacity:1;pointer-events:auto;transform:none}
+#toTop:hover{border-color:var(--indigo);color:var(--indigo)}
+#toTop:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+
+/* misc */
+.note{margin-top:20px;padding:12px 14px;border-radius:10px;background:var(--indigo-soft);color:var(--muted);font-size:0.7812rem;line-height:1.65}
+.note b{color:var(--ink)}
+.note a{color:var(--indigo)}
+.done{text-align:center;padding:32px 20px}
+.done .mark{font-family:var(--mincho);font-size:3.375rem;color:var(--moss);line-height:1}
+.done h2{margin:12px 0 6px;font-family:var(--mincho);font-size:1.375rem}
+.done p{margin:0;color:var(--muted);font-size:0.875rem}
+.tally{display:flex;gap:26px;justify-content:center;margin-top:18px}
+.tally div{display:flex;flex-direction:column;gap:2px}
+.tally b{font-size:1.625rem;font-variant-numeric:tabular-nums;font-weight:600}
+.tally span{font-size:0.6562rem;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+/* browse-detail grading */
+.bstate{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:0.8125rem;color:var(--muted)}
+.bstate .pill{font-size:0.6875rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--faint)}
+.bstate .pill.learned{background:color-mix(in srgb,var(--moss) 14%,transparent);border-color:color-mix(in srgb,var(--moss) 45%,var(--line));color:var(--moss)}
+.bstate .pill.seen{background:color-mix(in srgb,#D9A441 16%,transparent);border-color:color-mix(in srgb,#D9A441 50%,var(--line));color:#946A10}
+:root[data-theme="dark"] .bstate .pill.seen,
+:root:not([data-theme="light"]) .bstate .pill.seen{color:#D9A441}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- responsive ---------- */
+/* tablet / small laptop: give the grid bigger touch targets */
+@media (min-width:640px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:9px}
+  .face{padding:28px 26px}
+}
+@media (min-width:1000px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:10px}
+  .face{padding:30px 30px}
+  .card{margin-top:22px}
+}
+/* phones */
+@media (max-width:560px){
+  .bar-in{padding:8px 14px}
+  .wrap{padding-inline:14px}
+  .ctrls{gap:9px 10px}
+  .ctrl>span{display:none}
+  .stat{margin-left:auto;font-size:0.6875rem}
+  .head{gap:12px}
+  .keys{display:none}
+  .tabs{width:100%;order:3}
+  .homebtn span{display:none}
+  .homebtn{padding:5px 10px}
+  .tabs button{flex:1;padding:6px 4px}
+}
+@media (max-width:420px){
+  .face{padding:20px 15px}
+  ul.vocab .en{margin-left:0;width:100%;text-align:left}
+  .logo small{display:none}
+  .logo{font-size:1rem}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px}
+  .foot{gap:8px}
+  .btn{padding:12px 8px}
+}
+/* very narrow: let the controls stack without squashing the tabs */
+@media (max-width:360px){
+  .row1{gap:8px}
+  .tabs button{padding:5px 10px}
+}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="row1">
+      <button class="logo" id="home" title="Back to the start (Home)" aria-label="Back to the start">Kanji for JLPT<small id="total"></small></button>
+      <button class="homebtn" id="home2" title="Back to the start">⌂ <span>Home</span></button>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="t-study" aria-selected="true">Kanji</button>
+        <button role="tab" id="t-vocab" aria-selected="false">Vocab</button>
+        <button role="tab" id="t-quiz" aria-selected="false">Review</button>
+        <button role="tab" id="t-read" aria-selected="false">Read</button>
+        <button role="tab" id="t-browse" aria-selected="false">Browse</button>
+      </div>
+    </div>
+    <div class="track"><i id="track"></i></div>
+    <div class="ctrls">
+      <div class="ctrl"><span>Furigana <em>振り仮名</em></span>
+        <div class="seg" id="furi">
+          <button data-v="on" aria-pressed="true">On</button>
+          <button data-v="hover" aria-pressed="false">Tap</button>
+          <button data-v="off" aria-pressed="false">Off</button>
+        </div>
+      </div>
+      <div class="ctrl"><span>English <em>英語</em></span>
+        <div class="seg" id="trans">
+          <button data-v="on" aria-pressed="true">Show</button>
+          <button data-v="tap" aria-pressed="false">Tap</button>
+          <button data-v="off" aria-pressed="false">Hide</button>
+        </div>
+      </div>
+      <div class="ctrl"><span>Meaning <em>意味</em></span>
+        <div class="seg" id="gloss" aria-label="Word meanings on tap">
+          <button data-v="off" aria-pressed="true" title="No word meanings">Off</button>
+          <button data-v="on" aria-pressed="false" title="Tap a word in a passage to see its meaning as well as its reading">On</button>
+        </div>
+      </div>
+      <div class="ctrl"><span>Level <em>級</em></span>
+        <select id="lvlSel" aria-label="Choose a level"><option value="all">All levels</option><option value="N2" selected>N2 only</option><option value="N3">N3 only</option>
+<option value="N4">N4 only</option>
+<option value="N5">N5 only</option><option value="N1*">N1 extras</option></select>
+      </div>
+      <div class="ctrl"><span>Words <em>語彙</em></span>
+        <div class="seg" id="wl" aria-label="Vocabulary level">
+          <button data-v="all" aria-pressed="true" title="Show every word">All</button>
+          <button data-v="hide" aria-pressed="false" title="Hide words above the level you are studying">My level</button>
+        </div>
+      </div>
+      <div class="ctrl"><span>Text <em>文字</em></span>
+        <div class="seg" id="size" aria-label="Text size">
+          <button data-v="auto" aria-pressed="true" title="Match the screen">Auto</button>
+          <button data-v="s" aria-pressed="false" title="Small">S</button>
+          <button data-v="m" aria-pressed="false" title="Medium">M</button>
+          <button data-v="l" aria-pressed="false" title="Large">L</button>
+          <button data-v="xl" aria-pressed="false" title="Extra large">XL</button>
+        </div>
+      </div>
+      <div class="ctrl"><span>Theme <em>表示</em></span>
+        <div class="seg" id="theme" aria-label="Colour theme">
+          <button data-v="auto" aria-pressed="true" title="Follow the system">Auto</button>
+          <button data-v="light" aria-pressed="false" title="Light">☀</button>
+          <button data-v="dark" aria-pressed="false" title="Dark">☾</button>
+        </div>
+      </div>
+      <span class="stat" id="stat"></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="study">
+    <div class="deckbar">
+      <select id="deckSel" aria-label="Choose a set"></select>
+      <button class="chip" id="shuffle" aria-pressed="false">Shuffle</button>
+      <button class="chip" id="weakOnly" aria-pressed="false">Needs work</button>
+    </div>
+    <div id="stage"></div>
+    <p class="keys"><kbd>Space</kbd> flip · <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>←</kbd> <kbd>→</kbd> move · <kbd>F</kbd> furigana · <kbd>E</kbd> english · <kbd>T</kbd> theme</p>
+    <div class="note">
+      <b>Checked against the dictionaries.</b> Every reading and meaning was verified against KANJIDIC2
+      and cross-checked with Kanji alive; all 5,436 vocabulary words were verified against JMdict.
+      Sentence furigana is generated with the UniDic analyser and overridden with the verified vocabulary
+      readings. Progress is saved in this browser only — nothing is uploaded anywhere.
+      <br><br>
+      The badge beside each word is the JLPT <b>vocabulary</b> list it appears on, which is separate
+      from the kanji's own level — 政党 is an N2 word written with an N2 kanji, 与党 an N1 word written
+      with the same one. A dashed <b>—</b> means the word is on no JLPT vocabulary list at all;
+      党員 and 党首 are ordinary Japanese, the lists simply don't carry them. About a third of the
+      vocabulary here is unlisted in that way. Vocabulary-list data from
+      <a href="https://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener">Jonathan Waller</a> (CC BY).
+    </div>
+  </div>
+
+  <div id="vocab" hidden>
+    <div class="deckbar">
+      <select id="vdeckSel" aria-label="Choose a set"></select>
+      <button class="chip" id="vshuffle" aria-pressed="false">Shuffle</button>
+      <button class="chip" id="vweak" aria-pressed="false">Needs work</button>
+      <button class="chip" id="vlisted" aria-pressed="false" title="Only words that appear on a JLPT vocabulary list">On a list</button>
+    </div>
+    <div id="vstage"></div>
+    <p class="keys"><kbd>Space</kbd> flip · <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>←</kbd> <kbd>→</kbd> move · <kbd>F</kbd> furigana · <kbd>E</kbd> english</p>
+    <div class="note">
+      <b>The same words, the other way round.</b> These are the vocabulary already on the kanji
+      cards — you see the word, recall its reading and meaning, then check against the example
+      sentence. Progress here is kept separately from the kanji, so drilling a word doesn't mark
+      its kanji learned. The level menu and the <b>Words</b> filter both apply.
+    </div>
+  </div>
+
+  <div id="quiz" hidden>
+    <div class="deckbar">
+      <select id="qsrc" aria-label="What to review">
+        <option value="seen" selected>Anything I've marked</option>
+        <option value="today">Marked today</option>
+        <option value="week">Marked in the last 7 days</option>
+        <option value="learned">Learned only (box 3+)</option>
+        <option value="all">Everything at this level</option>
+      </select>
+      <select id="qlen" aria-label="How many questions">
+        <option>10</option><option selected>20</option><option>30</option><option>50</option>
+      </select>
+      <button class="chip" id="qk" aria-pressed="true">Kanji</button>
+      <button class="chip" id="qv" aria-pressed="true">Vocab</button>
+      <button class="chip" id="qstart" aria-pressed="true" style="font-weight:600">Start</button>
+    </div>
+    <div id="qstage"></div>
+    <p class="keys"><kbd>1</kbd>–<kbd>4</kbd> answer · <kbd>Space</kbd> next question</p>
+    <div class="note">
+      <b>Mixed revision.</b> Random questions built from what you've marked <b>Got it</b> — kanji
+      meanings and readings, word readings and meanings, and fill-in-the-blank sentences, shuffled
+      together. Wrong answers knock that item back a box so it returns in the Kanji and Vocab decks.
+    </div>
+  </div>
+
+  <div id="read" hidden>
+    <div class="deckbar">
+      <select id="rsel" aria-label="Choose a passage"></select>
+      <button class="chip" id="rprev">←</button>
+      <button class="chip" id="rnext">→</button>
+      <span class="stat" id="rinfo"></span>
+    </div>
+    <div id="rstage"></div>
+    <div class="note">
+      <b>Graded reading.</b> Each passage uses only kanji at or below its level — checked
+      automatically, so an N3 passage can never slip in an N2 character. Furigana and the English
+      translation follow the controls above; hide both and read it cold, then check yourself with
+      the questions, which use the same formats as the exam's 読解 section.
+      Turn <b>Meaning</b> on and tapping a word shows its dictionary form and English as well as
+      its reading, so you can look something up without leaving the passage.
+    </div>
+  </div>
+
+  <div id="browse" hidden>
+    <div class="deckbar"><input type="search" id="q" placeholder="Search kanji, reading, meaning or English…" autocomplete="off"></div>
+    <div id="results"></div>
+    <p class="keys">Open any kanji to mark it <b>Got it</b> or <b>Again</b> — the same progress the Study tab uses. <kbd>1</kbd> again · <kbd>2</kbd> got it · <kbd>→</kbd> next · <kbd>Esc</kbd> back</p>
+  </div>
+</div>
+
+<div class="wrap" style="padding-block:0 40px">
+  <div class="datarow">
+    <span class="dlabel">Progress <em>学習記録</em></span>
+    <button class="chip" id="exp">Export</button>
+    <button class="chip" id="imp">Import</button>
+    <button class="chip" id="rst">Reset</button>
+    <input type="file" id="impf" accept="application/json,.json" hidden>
+    <span class="dsep" id="dsep" hidden></span>
+    <button class="chip" id="link" hidden>Link a file…</button>
+    <button class="chip" id="unlink" hidden>Unlink</button>
+    <span class="dfile" id="dfile" hidden></span>
+    <span class="dmsg" id="dmsg"></span>
+  </div>
+  <p class="dnote">Progress lives in this browser. <b>Export</b> carries it to another device, and
+  <b>Import</b> merges it back, so nothing already learned is lost. <b>Link a file</b> goes further:
+  pick a file once and progress saves into it as you study and is restored whenever you return —
+  put it in a synced folder and your phone and laptop stay in step. That part needs Chrome or Edge
+  on a computer; everywhere else, use Export and Import.</p>
+</div>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">↑</button>
+
+<script>
+const DATA = __DATA__;
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const GLOSS = __GLOSS__;
+/* A run is [text, reading] or, where a dictionary word starts, [text, reading, glossId]. */
+const rubyRuns = runs => runs.map(([t, r, g]) => r
+    ? `<ruby${g === undefined ? '' : ` data-g="${g}"`}>${esc(t)}<rt>${esc(r)}</rt></ruby>`
+    : esc(t)).join('');
+const plain = runs => runs.map(([t]) => t).join('');
+
+const $ = id => document.getElementById(id);
+const stage = $('stage'), trackEl = $('track'), statEl = $('stat');
+
+/* ---------- persistence ---------- */
+const KEY = 'n2kanji-v1';
+let prog = {};
+try { prog = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) { prog = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prog)); } catch(e){}
+                     if (typeof fhQueue === 'function') fhQueue(); };
+const box = k => (prog[k] && prog[k].box) || 0;
+
+/* ---------- settings ---------- */
+const ROOT = document.documentElement;
+const SEGS = {furi:{attr:'data-furi', def:'on'}, trans:{attr:'data-trans', def:'on'},
+              gloss:{attr:'data-gloss', def:'off'},
+              wl:{attr:'data-wl', def:'all'},
+              size:{attr:'data-size', def:'auto'}, theme:{attr:'data-theme', def:'auto'}};
+
+function setSeg(id, val){
+  const {attr, def} = SEGS[id];
+  const el = $(id); if (!el) return;
+  if (![...el.children].some(b => b.dataset.v === val)) val = def;
+  [...el.children].forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === val)));
+  if (val === 'auto') ROOT.removeAttribute(attr); else ROOT.setAttribute(attr, val);
+  try { localStorage.setItem('n2-' + id, val); } catch(e){}
+  if (id === 'theme') paintChrome();
+}
+/* keep the mobile browser chrome in step with the theme */
+function paintChrome(){
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (!m) return;
+  requestAnimationFrame(() => {
+    m.setAttribute('content', getComputedStyle(ROOT).getPropertyValue('--paper').trim() || '#EDF0F4');
+  });
+}
+Object.keys(SEGS).forEach(id => {
+  let v = SEGS[id].def;
+  try { v = localStorage.getItem('n2-' + id) || v; } catch(e){}
+  setSeg(id, v);
+  $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSeg(id, b.dataset.v); });
+});
+if (window.matchMedia) try {
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', paintChrome);
+} catch(e){}
+
+const cycleFuri  = () => setSeg('furi', {on:'hover',hover:'off',off:'on'}[ROOT.getAttribute('data-furi')] || 'hover');
+const toggleTrans = () => setSeg('trans', {on:'tap',tap:'off',off:'on'}[ROOT.getAttribute('data-trans')] || 'on');
+const cycleTheme = () => setSeg('theme', {auto:'light',light:'dark',dark:'auto'}[ROOT.getAttribute('data-theme') || 'auto']);
+
+/* ---------- deck sets ---------- */
+const N = DATA.length;
+$('total').textContent = N + ' KANJI';
+const LVN = {1:'N1*', 3:'N3', 4:'N4', 5:'N5'};
+const lvlOf = d => LVN[d.x] || 'N2';
+let level = 'N2';
+try { level = localStorage.getItem('n2-level') || 'N2'; } catch(e){}
+$('lvlSel').value = level;
+let SETS = [];
+function pool(){ return level === 'all' ? DATA : DATA.filter(d => lvlOf(d) === level); }
+function buildSets(){
+  const P = pool(), M = P.length;
+  SETS = [{label:`All ${M} kanji`, from:0, to:M}];
+  for (let i = 0; i < M; i += 25) SETS.push({label:`${i+1} – ${Math.min(i+25,M)}`, from:i, to:Math.min(i+25,M)});
+  $('deckSel').innerHTML = SETS.map((s,i) => `<option value="${i}">${s.label}</option>`).join('');
+}
+$('lvlSel').onchange = e => {
+  level = e.target.value;
+  try { localStorage.setItem('n2-level', level); } catch(err){}
+  setIdx = 0; buildSets(); buildDeck();
+  rIdx = 0; if (typeof rfill === 'function'){ rfill(); if (!$('read').hidden) rrender(); }
+  vSetIdx = 0; if (typeof buildVDeck === 'function') buildVDeck();
+  if (!$('browse').hidden) renderBrowse($('q').value);
+};
+
+let setIdx = 0, shuffled = false, weak = false;
+let order = [], pos = 0, flipped = false, finished = false, good = 0, again = 0;
+
+function buildDeck(){
+  const s = SETS[setIdx] || SETS[0];
+  let ids = pool().slice(s.from, s.to).map(d => d.k);
+  if (weak) ids = ids.filter(k => box(k) < 3);
+  if (shuffled) for (let i = ids.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [ids[i],ids[j]] = [ids[j],ids[i]]; }
+  else ids.sort((a,b) => weak ? box(a)-box(b) : 0);
+  order = ids; pos = 0; flipped = false; finished = false; good = again = 0;
+  render();
+}
+$('deckSel').onchange = e => { setIdx = +e.target.value; buildDeck(); };
+$('shuffle').onclick = e => { shuffled = !shuffled; e.currentTarget.setAttribute('aria-pressed', shuffled); buildDeck(); };
+$('weakOnly').onclick = e => { weak = !weak; e.currentTarget.setAttribute('aria-pressed', weak); buildDeck(); };
+
+const byK = Object.fromEntries(DATA.map(d => [d.k, d]));
+
+function updateStat(){
+  if (typeof view !== 'undefined' && view === 'vocab'){
+    const P = vpool();
+    const learned = P.filter(v => vbox(v.w) >= 3).length;
+    statEl.textContent = `${learned} / ${P.length} words`;
+    trackEl.style.width = (P.length ? learned / P.length * 100 : 0) + '%';
+    return;
+  }
+  const P = pool();
+  const learned = P.filter(d => box(d.k) >= 3).length;
+  statEl.textContent = `${learned} / ${P.length} learned`;
+  trackEl.style.width = (P.length ? learned / P.length * 100 : 0) + '%';
+}
+
+/* ---------- detail markup ---------- */
+const WLN = {1:'N1', 2:'N2', 3:'N3', 4:'N4', 5:'N5'};
+/* a word is "over" when its vocabulary-list level is harder than the level being studied */
+const overLevel = wl => {
+  if (!wl || level === 'all') return false;
+  const cur = {N5:5, N4:4, N3:3, N2:2, 'N1*':1}[level];
+  return cur !== undefined && wl < cur;
+};
+function detail(c, withGlyph){
+  const vocab = c.v.map(([w,r,en,wl], i) => {
+    const over = overLevel(wl) ? ' class="over"' : '';
+    const tag  = wl ? `<span class="wl w${wl}" title="on the JLPT ${WLN[wl]} vocabulary list">${WLN[wl]}</span>`
+                    : `<span class="wl none" title="not on any JLPT vocabulary list — a common word the lists happen not to carry">—</span>`;
+    return `<li${over}><span class="w"><ruby>${esc(w)}<rt>${esc(r)}</rt></ruby></span>${tag}<span class="en">${esc(en)}</span></li>`;
+  }).join('');
+  const sents = c.s.map(([runs,en], i) => {
+    const wl = (c.v[i] || [])[3];
+    const over = overLevel(wl) ? ' class="over"' : '';
+    return `<li${over}><div class="jp">${rubyRuns(runs)}</div><div class="en">${esc(en)}</div></li>`;
+  }).join('');
+  const hidden = c.v.filter(v => overLevel(v[3])).length;
+  const note = hidden ? `<p class="hint" style="text-align:left;margin:8px 0 0" data-onlywhenhidden>${hidden} word${hidden>1?'s':''} above ${level} hidden</p>` : '';
+  return `
+    <div class="head">
+      ${withGlyph ? `<div class="glyph-sm">${esc(c.k)}</div>` : ''}
+      <div class="readings">
+        <div class="rd"><b>音</b><span>${esc(c.o)}</span></div>
+        <div class="rd"><b class="kun">訓</b><span>${esc(c.u)}</span></div>
+      </div>
+    </div>
+    <p class="gloss">${esc(c.m)}</p>
+    <div class="sec"><h2>Vocabulary <em>語彙</em></h2><ul class="vocab">${vocab}</ul>${note}</div>
+    <div class="sec"><h2>Sentences <em>例文</em></h2><ol class="sents">${sents}</ol></div>`;
+}
+
+/* ---------- study ---------- */
+function render(){
+  if (!order.length){ stage.innerHTML = `<p class="empty">Nothing in this set — everything here is already learned.</p>`; updateStat(); return; }
+  if (finished) return renderDone();
+  const c = byK[order[pos]];
+  updateStat();
+  if (!flipped){
+    stage.innerHTML = `
+      <div class="card"><div class="face"><div class="prompt">
+        <div class="glyph">${esc(c.k)}</div>
+        <p class="hint">#${c.n}${c.x?` <span class="lv ${c.x===1?'':'n'+c.x}">${c.x===1?'N1 extra':'N'+c.x}</span>`:''} · recall the readings and a word that uses it</p>
+        <button class="reveal" id="rev">Show reading</button>
+      </div></div></div>
+      <div class="nav"><button class="lnk" data-go="-1">← Previous</button><span class="lnk">${pos+1} / ${order.length}</span><button class="lnk" data-go="1">Skip →</button></div>`;
+  } else {
+    stage.innerHTML = `
+      <div class="card"><div class="face">${detail(c, true)}</div></div>
+      <div class="foot"><button class="btn again" data-mark="0">Again</button><button class="btn good" data-mark="1">Got it</button></div>
+      <div class="nav"><button class="lnk" data-go="-1">← Previous</button><span class="lnk">${pos+1} / ${order.length}</span><button class="lnk" data-go="1">Next →</button></div>`;
+  }
+  wire();
+}
+function renderDone(){
+  stage.innerHTML = `
+    <div class="card"><div class="done">
+      <div class="mark">終</div><h2>Set finished</h2>
+      <p>${order.length} kanji reviewed.</p>
+      <div class="tally">
+        <div><b style="color:var(--moss)">${good}</b><span>Got it</span></div>
+        <div><b style="color:var(--persimmon)">${again}</b><span>Again</span></div>
+      </div>
+    </div></div>
+    <div class="foot"><button class="btn" id="restart">Go again</button></div>`;
+  $('restart').onclick = buildDeck;
+  updateStat();
+}
+function wire(){
+  const r = $('rev'); if (r) r.onclick = () => { flipped = true; render(); };
+  stage.querySelectorAll('[data-go]').forEach(b => b.onclick = () => move(+b.dataset.go));
+  stage.querySelectorAll('[data-mark]').forEach(b => b.onclick = () => mark(+b.dataset.mark));
+  hookRuby(stage);
+}
+function hookTrans(root){
+  root.querySelectorAll('.jp').forEach(el => el.addEventListener('click', () => {
+    if (ROOT.getAttribute('data-trans') !== 'tap') return;
+    if (el.closest('.rs')) return;                       /* reading handles its own */
+    const en = el.parentElement && el.parentElement.querySelector('.en');
+    if (en) en.classList.toggle('on');
+  }));
+}
+function hookRuby(root){
+  hookTrans(root);
+  root.querySelectorAll('ruby').forEach(r => r.onclick = () => {
+    const tap = ROOT.getAttribute('data-furi') === 'hover';
+    const wantGloss = ROOT.getAttribute('data-gloss') === 'on' && r.dataset.g !== undefined;
+    if (wantGloss){
+      /* reading and meaning open and close together, so they never disagree */
+      const show = gfor !== r;
+      if (tap) r.classList.toggle('on', show);
+      if (show) showGloss(r); else hideGloss();
+    } else {
+      if (tap) r.classList.toggle('on');
+      hideGloss();
+    }
+  });
+}
+
+/* ---------- word meanings on tap (Meaning: On) ---------- */
+let gtip = null, gfor = null;
+function showGloss(r){
+  const g = GLOSS[+r.dataset.g];
+  if (!g) return hideGloss();
+  if (!gtip){
+    gtip = document.createElement('div');
+    gtip.id = 'gtip';
+    gtip.addEventListener('click', hideGloss);
+    document.body.appendChild(gtip);
+  }
+  gtip.innerHTML = `<b>${esc(g[0])}</b><span>${esc(g[1])}</span>`;
+  gtip.classList.add('show');
+  gtip.style.visibility = 'hidden';
+  gtip.style.left = gtip.style.top = '0px';
+  const b = r.getBoundingClientRect(), w = gtip.offsetWidth, h = gtip.offsetHeight;
+  let x = b.left + b.width / 2 - w / 2;
+  x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+  let y = b.bottom + 7;
+  if (y + h > window.innerHeight - 8) y = Math.max(8, b.top - h - 7);
+  gtip.style.left = x + 'px';
+  gtip.style.top = y + 'px';
+  gtip.style.visibility = '';
+  gfor = r;
+}
+function hideGloss(){
+  if (gtip) gtip.classList.remove('show');
+  gfor = null;
+}
+window.addEventListener('scroll', hideGloss, {passive:true});
+window.addEventListener('resize', hideGloss);
+document.addEventListener('click', e => { if (!e.target.closest('ruby') && !e.target.closest('#gtip')) hideGloss(); }, true);
+function move(d){
+  const n = pos + d;
+  if (n < 0) return;
+  if (n >= order.length){ finished = true; return render(); }
+  pos = n; flipped = false; render();
+}
+function mark(ok){
+  const k = order[pos];
+  const p = prog[k] || (prog[k] = {box:0, seen:0});
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0; p.t = Date.now();
+  if (ok) good++; else again++;
+  save(); move(1);
+}
+
+/* ---------- browse ---------- */
+function browseList(){
+  const t = (($('q') && $('q').value) || '').trim().toLowerCase();
+  if (!t) return pool();
+  return pool().filter(d =>
+    d.k === t || d.k.includes(t) ||
+    (d.o || '').toLowerCase().includes(t) || (d.u || '').toLowerCase().includes(t) ||
+    (d.m || '').toLowerCase().includes(t) ||
+    d.v.some(v => v[0].includes(t) || v[1].includes(t) || v[2].toLowerCase().includes(t)) ||
+    d.s.some(s => s[1].toLowerCase().includes(t) || plain(s[0]).includes(t)));
+}
+const matches = (d, t) =>
+  d.k === t || d.k.includes(t) ||
+  (d.o || '').toLowerCase().includes(t) || (d.u || '').toLowerCase().includes(t) ||
+  (d.m || '').toLowerCase().includes(t) ||
+  d.v.some(v => v[0].includes(t) || v[1].includes(t) || v[2].toLowerCase().includes(t)) ||
+  d.s.some(s => s[1].toLowerCase().includes(t) || plain(s[0]).includes(t));
+
+function renderBrowse(term){
+  const t = (term || '').trim().toLowerCase();
+  browseK = null;
+  let list = pool();
+  /* a search always looks at every level; the filter must not hide a kanji you asked for */
+  let elsewhere = 0, elseKanji = '';
+  if (t){
+    list = pool().filter(d => matches(d, t));
+    if (level !== 'all'){
+      const all = DATA.filter(d => matches(d, t));
+      elsewhere = all.length - list.length;
+      elseKanji = all.filter(d => !list.includes(d)).slice(0, 12).map(d => d.k).join('');
+    }
+  }
+  const banner = elsewhere ? `<div class="note" style="margin-top:14px">
+      <b>${elsewhere} more match outside ${esc(level)}:</b> <span class="jp">${esc(elseKanji)}</span>${elsewhere > 12 ? ' …' : ''}
+      <button class="chip" id="seeall" style="margin-left:8px">Show all levels</button></div>` : '';
+  const wire = () => { const s = $('seeall'); if (s) s.onclick = () => {
+      $('lvlSel').value = 'all'; $('lvlSel').dispatchEvent(new Event('change')); }; };
+  if (!list.length){
+    $('results').innerHTML = `<p class="empty">No kanji at ${esc(level)} match “${esc(term)}”.</p>` + banner;
+    wire(); return;
+  }
+  $('results').innerHTML = banner + `<div class="grid">` + list.map(d => {
+    const b = box(d.k);
+    const dot = b >= 3 ? 'b3' : b >= 1 ? 'b2' : (prog[d.k] ? 'b1' : '');
+    return `<button class="tile" data-k="${esc(d.k)}" title="${esc(d.m)}">${esc(d.k)}${dot ? `<i class="${dot}"></i>` : ''}${d.x ? `<em class="${d.x===1?'':'n'+d.x}">${d.x===1?'N1':'N'+d.x}</em>` : ''}</button>`;
+  }).join('') + `</div>`;
+  $('results').querySelectorAll('.tile').forEach(b => b.onclick = () => openDetail(b.dataset.k));
+  wire();
+}
+function stateLine(k){
+  const b = box(k), seen = (prog[k] && prog[k].seen) || 0;
+  const pill = b >= 3 ? `<span class="pill learned">Learned</span>`
+             : seen    ? `<span class="pill seen">Box ${b} of 5</span>`
+                       : `<span class="pill">Not studied</span>`;
+  return `<div class="bstate">${pill}<span>${seen ? seen + (seen === 1 ? ' review' : ' reviews') : 'no reviews yet'}</span></div>`;
+}
+let browseK = null;
+function openDetail(k){
+  const c = byK[k];
+  browseK = k;
+  $('results').innerHTML = `
+    <div class="nav"><button class="lnk" id="back">← All kanji</button><button class="lnk" id="bnext">Next kanji →</button></div>
+    <div class="card"><div class="face">
+      <div class="prompt" style="padding-block:6px 14px"><div class="glyph" style="font-size:clamp(4.375rem,20vw,6.5rem)">${esc(c.k)}</div>
+      <p class="hint">#${c.n}${c.x?` <span class="lv ${c.x===1?'':'n'+c.x}">${c.x===1?'N1 extra':'N'+c.x}</span>`:''}</p></div>
+      ${detail(c, false)}
+      <div id="bst">${stateLine(k)}</div>
+    </div></div>
+    <div class="foot"><button class="btn again" id="bagain">Again</button><button class="btn good" id="bgood">Got it</button></div>`;
+  $('back').onclick = () => { renderBrowse($('q').value); };
+  $('bnext').onclick = () => {
+    const list = browseList();
+    const i = list.findIndex(d => d.k === browseK);
+    if (i > -1 && i + 1 < list.length) openDetail(list[i+1].k);
+  };
+  $('bagain').onclick = () => browseMark(0);
+  $('bgood').onclick  = () => browseMark(1);
+  hookRuby($('results'));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function browseMark(ok){
+  const p = prog[browseK] || (prog[browseK] = {box:0, seen:0});
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0; p.t = Date.now();
+  save(); updateStat();
+  const el = $('bst'); if (el) el.innerHTML = stateLine(browseK);
+  /* if this card is in the deck being studied, keep that view honest too */
+  if (!$('study').hidden) render();
+}
+$('q').addEventListener('input', e => renderBrowse(e.target.value));
+
+/* ---------- vocabulary deck ---------- */
+/* flatten the kanji cards into one word list; a word that sits on two kanji is kept once */
+const VOCAB = (() => {
+  const seen = new Map();
+  DATA.forEach(d => d.v.forEach((v, i) => {
+    if (seen.has(v[0])) return;
+    seen.set(v[0], {w:v[0], r:v[1], en:v[2], wl:v[3], k:d.k, x:d.x, s:d.s[i]});
+  }));
+  return [...seen.values()];
+})();
+const VKEY = w => 'w|' + w;                   /* keep word progress apart from kanji progress */
+const vbox = w => (prog[VKEY(w)] && prog[VKEY(w)].box) || 0;
+
+let vSets = [], vSetIdx = 0, vShuf = false, vWeak = false, vListed = false;
+let vorder = [], vpos = 0, vflip = false, vdone = false, vgood = 0, vagain = 0;
+
+function vpool(){
+  let P = VOCAB;
+  if (level !== 'all') P = P.filter(v => (LVN[v.x] || 'N2') === level);
+  if (vListed) P = P.filter(v => v.wl);
+  if (ROOT.getAttribute('data-wl') === 'hide') P = P.filter(v => !overLevel(v.wl));
+  return P;
+}
+function buildVSets(){
+  const M = vpool().length;
+  vSets = [{label:`All ${M} words`, from:0, to:M}];
+  for (let i = 0; i < M; i += 25) vSets.push({label:`${i+1} – ${Math.min(i+25,M)}`, from:i, to:Math.min(i+25,M)});
+  $('vdeckSel').innerHTML = vSets.map((s,i) => `<option value="${i}">${s.label}</option>`).join('');
+  if (vSetIdx >= vSets.length) vSetIdx = 0;
+  $('vdeckSel').value = vSetIdx;
+}
+function buildVDeck(){
+  buildVSets();
+  const s = vSets[vSetIdx] || vSets[0];
+  let list = vpool().slice(s.from, s.to);
+  if (vWeak) list = list.filter(v => vbox(v.w) < 3);
+  if (vShuf) for (let i = list.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [list[i],list[j]] = [list[j],list[i]]; }
+  vorder = list; vpos = 0; vflip = false; vdone = false; vgood = vagain = 0;
+  vrender();
+}
+$('vdeckSel').onchange = e => { vSetIdx = +e.target.value; buildVDeck(); };
+$('vshuffle').onclick = e => { vShuf = !vShuf; e.currentTarget.setAttribute('aria-pressed', vShuf); buildVDeck(); };
+$('vweak').onclick    = e => { vWeak = !vWeak; e.currentTarget.setAttribute('aria-pressed', vWeak); buildVDeck(); };
+$('vlisted').onclick  = e => { vListed = !vListed; e.currentTarget.setAttribute('aria-pressed', vListed); vSetIdx = 0; buildVDeck(); };
+
+function vrender(){
+  const st = $('vstage');
+  if (!vorder.length){ st.innerHTML = `<p class="empty">Nothing in this set.</p>`; updateStat(); return; }
+  if (vdone){
+    st.innerHTML = `
+      <div class="card"><div class="done">
+        <div class="mark">終</div><h2>Set finished</h2><p>${vorder.length} words reviewed.</p>
+        <div class="tally">
+          <div><b style="color:var(--moss)">${vgood}</b><span>Got it</span></div>
+          <div><b style="color:var(--persimmon)">${vagain}</b><span>Again</span></div>
+        </div>
+      </div></div>
+      <div class="foot"><button class="btn" id="vrestart">Go again</button></div>`;
+    $('vrestart').onclick = buildVDeck; updateStat(); return;
+  }
+  const v = vorder[vpos];
+  const lvchip = v.x ? ` <span class="lv ${v.x===1?'':'n'+v.x}">${v.x===1?'N1 extra':'N'+v.x}</span>` : '';
+  const wlchip = v.wl ? ` <span class="wl w${v.wl}">${WLN[v.wl]}</span>`
+                      : ` <span class="wl none" title="not on any JLPT vocabulary list">—</span>`;
+  updateStat();
+  if (!vflip){
+    st.innerHTML = `
+      <div class="card"><div class="face"><div class="prompt">
+        <div class="glyph" style="font-size:clamp(2.75rem,11vw,4.25rem)">${esc(v.w)}</div>
+        <p class="hint">from 「${esc(v.k)}」${lvchip}${wlchip} · recall the reading and the meaning</p>
+        <button class="reveal" id="vrev">Show reading</button>
+      </div></div></div>
+      <div class="nav"><button class="lnk" data-vgo="-1">← Previous</button><span class="lnk">${vpos+1} / ${vorder.length}</span><button class="lnk" data-vgo="1">Skip →</button></div>`;
+  } else {
+    st.innerHTML = `
+      <div class="card"><div class="face">
+        <div class="prompt" style="padding-block:6px 14px">
+          <div class="glyph" style="font-size:clamp(2.5rem,10vw,3.75rem)"><ruby>${esc(v.w)}<rt style="font-size:.38em">${esc(v.r)}</rt></ruby></div>
+          <p class="hint">from 「${esc(v.k)}」${lvchip}${wlchip}</p>
+        </div>
+        <p class="gloss" style="text-align:center;font-size:1rem">${esc(v.en)}</p>
+        <div class="sec"><h2>In a sentence <em>例文</em></h2>
+          <ol class="sents"><li><div class="jp">${rubyRuns(v.s[0])}</div><div class="en">${esc(v.s[1])}</div></li></ol>
+        </div>
+      </div></div>
+      <div class="foot"><button class="btn again" data-vmark="0">Again</button><button class="btn good" data-vmark="1">Got it</button></div>
+      <div class="nav"><button class="lnk" data-vgo="-1">← Previous</button><span class="lnk">${vpos+1} / ${vorder.length}</span><button class="lnk" data-vgo="1">Next →</button></div>`;
+  }
+  const r = $('vrev'); if (r) r.onclick = () => { vflip = true; vrender(); };
+  st.querySelectorAll('[data-vgo]').forEach(b => b.onclick = () => vmove(+b.dataset.vgo));
+  st.querySelectorAll('[data-vmark]').forEach(b => b.onclick = () => vmark(+b.dataset.vmark));
+  hookRuby(st);
+}
+function vmove(d){
+  const n = vpos + d;
+  if (n < 0) return;
+  if (n >= vorder.length){ vdone = true; return vrender(); }
+  vpos = n; vflip = false; vrender();
+}
+function vmark(ok){
+  const key = VKEY(vorder[vpos].w);
+  const p = prog[key] || (prog[key] = {box:0, seen:0});
+  p.seen++; p.box = ok ? Math.min(5, p.box + 1) : 0; p.t = Date.now();
+  if (ok) vgood++; else vagain++;
+  save(); vmove(1);
+}
+
+/* replace the runs that spell `word` with a blank, keeping furigana on the rest */
+function blankRuns(runs, word){
+  const out = []; let i = 0, done = false;
+  while (i < runs.length){
+    if (!done){
+      let acc = '', j = i;
+      while (j < runs.length && acc.length < word.length){ acc += runs[j][0]; j++; }
+      if (acc === word){ out.push(['＿＿＿', null]); i = j; done = true; continue; }
+      /* the word may start part-way through a plain run */
+      const t = runs[i][0], at = runs[i][1] ? -1 : t.indexOf(word);
+      if (at >= 0){
+        if (at) out.push([t.slice(0, at), null]);
+        out.push(['＿＿＿', null]);
+        if (at + word.length < t.length) out.push([t.slice(at + word.length), null]);
+        i++; done = true; continue;
+      }
+    }
+    out.push(runs[i]); i++;
+  }
+  return done ? out : null;
+}
+
+/* ---------- review quiz ---------- */
+const shuffle = a => { for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const moras = s => (s || '').replace(/[ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ]/g,'').length;
+
+let qUseK = true, qUseV = true, qList = [], qPos = 0, qAnswered = null, qScore = 0, qMissed = [];
+
+/* start of today, in the viewer's own timezone */
+const dayStart = () => { const d = new Date(); d.setHours(0,0,0,0); return d.getTime(); };
+const since = n => dayStart() - (n - 1) * 86400000;
+
+/* which items are eligible, given the Source menu */
+function quizPools(){
+  const src = $('qsrc').value;
+  const cut = src === 'today' ? dayStart() : src === 'week' ? since(7) : 0;
+  const ok = p => {
+    if (src === 'all') return true;
+    if (!p) return false;
+    if (src === 'learned') return (p.box || 0) >= 3;
+    if (cut) return (p.t || 0) >= cut;
+    return (p.seen || 0) > 0;
+  };
+  const K = pool().filter(d => ok(prog[d.k]));
+  const V = vpool().filter(v => ok(prog[VKEY(v.w)]));
+  return {K, V};
+}
+
+/* build one question; returns null if it can't be made */
+function makeQ(type, item, K, V){
+  const opts = (correct, others) => {
+    const o = [correct];
+    for (const c of others){ if (o.length >= 4) break; if (!o.includes(c) && c) o.push(c); }
+    return o.length >= 2 ? shuffle(o) : null;
+  };
+  if (type === 'k-mean'){
+    const others = shuffle(K.filter(d => d.k !== item.k)).map(d => d.m);
+    const o = opts(item.m, others); if (!o) return null;
+    return {q:`What does this kanji mean?`, big:item.k, sub:'', opts:o, ans:item.m, key:item.k, kind:'kanji',
+            info:`音 ${item.o} · 訓 ${item.u}`, ex:item.s[0], exEn:item.s[0][1], exW:item.v[0][0]};
+  }
+  if (type === 'k-on'){
+    if (!item.o || item.o === '—') return null;
+    const others = shuffle(K.filter(d => d.k !== item.k && d.o && d.o !== '—' && moras(d.o) === moras(item.o))).map(d => d.o);
+    const loose  = shuffle(K.filter(d => d.k !== item.k && d.o && d.o !== '—')).map(d => d.o);
+    const o = opts(item.o, others.concat(loose)); if (!o) return null;
+    return {q:`Which is the on'yomi (音読み)?`, big:item.k, enSub:item.m, opts:o, ans:item.o, key:item.k, kind:'kanji',
+            info:`訓 ${item.u} · ${item.m}`, ex:item.s[0], exW:item.v[0][0]};
+  }
+  if (type === 'w-read'){
+    const same = shuffle(V.filter(v => v.w !== item.w && moras(v.r) === moras(item.r))).map(v => v.r);
+    const any  = shuffle(V.filter(v => v.w !== item.w)).map(v => v.r);
+    const o = opts(item.r, same.concat(any)); if (!o) return null;
+    return {q:`How is this word read?`, big:item.w, sub:'', opts:o, ans:item.r, key:VKEY(item.w), kind:'word',
+            info:`${item.w}（${item.r}）— ${item.en}`, ex:item.s};
+  }
+  if (type === 'w-mean'){
+    const others = shuffle(V.filter(v => v.w !== item.w)).map(v => v.en);
+    const o = opts(item.en, others); if (!o) return null;
+    return {q:`What does this word mean?`, big:item.w, sub:item.r, opts:o, ans:item.en, key:VKEY(item.w), kind:'word',
+            info:`${item.w}（${item.r}）— ${item.en}`, ex:item.s};
+  }
+  if (type === 'mean-w'){
+    const others = shuffle(V.filter(v => v.w !== item.w && v.k === item.k)).map(v => v.w);
+    const any    = shuffle(V.filter(v => v.w !== item.w)).map(v => v.w);
+    const o = opts(item.w, others.concat(any)); if (!o) return null;
+    return {q:`Which word means this?`, big:'', sub:'', prompt:item.en, opts:o, ans:item.w, key:VKEY(item.w), kind:'word', jp:true,
+            info:`${item.w}（${item.r}）— ${item.en}`, ex:item.s};
+  }
+  if (type === 'cloze'){
+    const sent = plain(item.s[0]);
+    if (!sent.includes(item.w)) return null;
+    const blanked = blankRuns(item.s[0], item.w);
+    if (!blanked) return null;
+    const same = shuffle(V.filter(v => v.w !== item.w && v.w.length === item.w.length)).map(v => v.w);
+    const any  = shuffle(V.filter(v => v.w !== item.w)).map(v => v.w);
+    const o = opts(item.w, same.concat(any)); if (!o) return null;
+    return {q:`Which word fills the gap?`, big:'', runs:blanked, opts:o, ans:item.w,
+            key:VKEY(item.w), kind:'word', jp:true, fullRuns:item.s[0], fullEn:item.s[1],
+            info:`${item.w}（${item.r}）— ${item.en}`};
+  }
+  return null;
+}
+
+function buildQuiz(){
+  const {K, V} = quizPools();
+  const want = +$('qlen').value;
+  const kTypes = ['k-mean','k-on'], vTypes = ['w-read','w-mean','mean-w','cloze'];
+  const st = $('qstage');
+  if ((qUseK ? K.length : 0) + (qUseV ? V.length : 0) < 4){
+    const src = $('qsrc').value;
+    const why = src === 'today' ? 'Nothing marked today yet.'
+              : src === 'week'  ? 'Nothing marked in the last 7 days.'
+              : src === 'learned' ? 'Nothing has reached box 3 yet — that takes three correct reviews.'
+              : 'Not enough to build a quiz yet.';
+    st.innerHTML = `<p class="empty">${why}<br>
+      Study some cards in the Kanji or Vocab tab, or change <b>Source</b> above.</p>`;    qList = []; return;
+  }
+  const bag = [];
+  const kPool = shuffle(K.slice()), vPool = shuffle(V.slice());
+  let ki = 0, vi = 0, guard = 0;
+  while (bag.length < want && guard++ < want * 12){
+    const useK = qUseK && (!qUseV || Math.random() < K.length / (K.length + V.length || 1));
+    let q = null;
+    if (useK && kPool.length) q = makeQ(pick(kTypes), kPool[ki++ % kPool.length], K, V);
+    else if (qUseV && vPool.length) q = makeQ(pick(vTypes), vPool[vi++ % vPool.length], K, V);
+    if (q && !bag.some(b => b.key === q.key && b.q === q.q)) bag.push(q);
+  }
+  qList = bag; qPos = 0; qAnswered = null; qScore = 0; qMissed = [];
+  qrender();
+}
+
+function qrender(){
+  const st = $('qstage');
+  if (!qList.length) return;
+  if (qPos >= qList.length){
+    const pct = Math.round(qScore / qList.length * 100);
+    st.innerHTML = `
+      <div class="card"><div class="done">
+        <div class="mark">${pct >= 80 ? '優' : pct >= 60 ? '良' : '可'}</div>
+        <h2>${qScore} of ${qList.length} correct</h2>
+        <p>${pct}%</p>
+      </div>
+      ${qMissed.length ? `<div class="face" style="padding-top:0">
+        <div class="sec"><h2>Worth another look</h2><ul class="vocab">` +
+        qMissed.map(m => `<li><span class="w">${esc(m.shown)}</span><span class="en">${esc(m.ans)}</span></li>`).join('') +
+        `</ul></div></div>` : ''}
+      </div>
+      <div class="foot"><button class="btn good" id="qagain">New quiz</button></div>`;
+    $('qagain').onclick = buildQuiz;
+    updateStat(); return;
+  }
+  const q = qList[qPos];
+  const body = q.runs
+      ? `<div class="jp" style="text-align:center">${rubyRuns(q.runs)}</div>`
+      : q.prompt
+      ? `<div class="jp" style="text-align:center;font-size:${q.jp ? '1.35rem' : '1rem'};line-height:1.9">${esc(q.prompt)}</div>`
+      : `<div class="glyph" style="font-size:clamp(3rem,13vw,5rem)">${esc(q.big)}</div>`;
+  st.innerHTML = `
+    <div class="card"><div class="face">
+      <p class="hint" style="text-align:left;margin:0 0 14px">Question ${qPos+1} of ${qList.length} · ${qScore} correct</p>
+      <div class="prompt" style="padding-block:4px 16px;gap:8px">
+        ${body}
+        ${q.sub   ? `<p class="hint">${esc(q.sub)}</p>` : ''}
+        ${q.enSub ? `<p class="hint en">${esc(q.enSub)}</p>` : ''}
+        <p class="hint" style="font-weight:600;color:var(--ink)">${esc(q.q)}</p>
+      </div>
+      <div class="opts">${q.opts.map((o,i) =>
+        `<button class="opt${q.jp||q.q.includes('read')||q.q.includes('yomi')?' jpopt':''}" data-o="${i}"><b>${i+1}</b>${esc(o)}</button>`).join('')}</div>
+      <div id="qfb"></div>
+    </div></div>`;
+  st.querySelectorAll('.opt').forEach(b => b.onclick = () => qanswer(+b.dataset.o));
+  hookRuby(st);
+  qAnswered = null;
+}
+
+function qanswer(i){
+  if (qAnswered !== null) return;
+  const q = qList[qPos];
+  const chosen = q.opts[i];
+  const right = chosen === q.ans;
+  qAnswered = i;
+  if (right) qScore++;
+  else {
+    qMissed.push({shown: q.big || q.prompt, ans: q.ans});
+    const p = prog[q.key] || (prog[q.key] = {box:0, seen:0});
+    p.box = Math.max(0, p.box - 1);            /* knock it back so it returns in the decks */
+    p.seen++; p.t = Date.now();
+    save();
+  }
+  $('qstage').querySelectorAll('.opt').forEach((b, j) => {
+    b.disabled = true;
+    if (q.opts[j] === q.ans) b.classList.add('right');
+    else if (j === i) b.classList.add('wrong');
+  });
+  const exRuns = q.fullRuns || (q.ex && q.ex[0]);
+  const exEn   = q.fullEn   || (q.ex && q.ex[1]);
+  $('qfb').innerHTML = `
+    <p class="hint" style="text-align:left;margin-top:14px;font-weight:600;color:${right?'var(--moss)':'var(--persimmon)'}">
+      ${right ? '正解 — correct' : '不正解 — the answer is ' + esc(q.ans)}</p>
+    ${q.info ? `<p class="hint" style="text-align:left;margin:2px 0 0"><span class="jp">${esc(q.info)}</span></p>` : ''}
+    ${exRuns ? `<div class="sec" style="margin-top:12px"><h2>Example <em>例文</em></h2>
+        <ol class="sents"><li><div class="jp">${rubyRuns(exRuns)}</div>
+        <div class="en">${esc(exEn || '')}</div></li></ol></div>` : ''}
+    <div class="foot"><button class="btn good" id="qnext">${qPos+1 < qList.length ? 'Next question' : 'See result'}</button></div>`;
+  $('qnext').onclick = () => { qPos++; qrender(); };
+  hookRuby($('qfb'));
+  updateStat();
+}
+
+$('qstart').onclick = buildQuiz;
+$('qsrc').onchange = buildQuiz;
+$('qlen').onchange = buildQuiz;
+$('qk').onclick = e => { qUseK = !qUseK; if (!qUseK && !qUseV){ qUseV = true; $('qv').setAttribute('aria-pressed', true); } e.currentTarget.setAttribute('aria-pressed', qUseK); buildQuiz(); };
+$('qv').onclick = e => { qUseV = !qUseV; if (!qUseK && !qUseV){ qUseK = true; $('qk').setAttribute('aria-pressed', true); } e.currentTarget.setAttribute('aria-pressed', qUseV); buildQuiz(); };
+
+/* ---------- progress export / import ---------- */
+const dmsg = (t, err) => { const el = $('dmsg'); el.textContent = t; el.classList.toggle('err', !!err);
+                           clearTimeout(dmsg._t); dmsg._t = setTimeout(() => { el.textContent = ''; }, 6000); };
+const countItems = o => { let k = 0, w = 0;
+  for (const key in o) (key.startsWith('w|') ? w++ : k++); return {k, w, n: k + w}; };
+
+$('exp').onclick = () => {
+  const c = countItems(prog);
+  if (!c.n) return dmsg('Nothing studied yet — nothing to export.', true);
+  const payload = {app:'kanji-for-jlpt', version:1, exported:new Date().toISOString(),
+                   counts:{kanji:c.k, words:c.w}, items:prog};
+  const text = JSON.stringify(payload);
+  const name = `kanji-progress-${new Date().toISOString().slice(0,10)}.json`;
+  saveFile(name, text, `Exported ${c.k} kanji and ${c.w} words.`);
+};
+
+/* Saving differs by host: a plain page downloads a blob, while the artifact viewer
+   never grants pages a direct download and mediates it through its own capability. */
+let savePath = null;
+async function saveFile(name, text, okMsg){
+  if (savePath === null){
+    savePath = 'blob';
+    try {
+      if (window.claude && typeof window.claude.use === 'function'){
+        const d = await window.claude.use('downloads');
+        if (d && typeof d.save === 'function') savePath = d;
+      }
+    } catch(e){ savePath = 'blob'; }
+  }
+  if (savePath !== 'blob'){
+    try { await savePath.save({filename:name, data:text}); dmsg(okMsg); }
+    catch(err){
+      dmsg(err && err.code === 'declined' ? 'Save cancelled.'
+         : 'Could not save the file here — open the site version to export.', true);
+    }
+    return;
+  }
+  const url = URL.createObjectURL(new Blob([text], {type:'application/json'}));
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  dmsg(okMsg);
+}
+
+$('imp').onclick = () => $('impf').click();
+$('impf').onchange = e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  const r = new FileReader();
+  r.onerror = () => dmsg('Could not read that file.', true);
+  r.onload = () => {
+    let data;
+    try { data = JSON.parse(r.result); } catch(err){ return dmsg('That is not a valid progress file.', true); }
+    const items = data && data.items;
+    if (!items || typeof items !== 'object' || Array.isArray(items))
+      return dmsg('That file has no progress in it.', true);
+    /* merge by taking the better of the two, so re-importing the same file changes nothing */
+    let added = 0, raised = 0;
+    for (const key in items){
+      const v = items[key];
+      if (!v || typeof v !== 'object') continue;
+      const box  = Math.max(0, Math.min(5, Number(v.box)  || 0));
+      const seen = Math.max(0, Number(v.seen) || 0);
+      const cur = prog[key];
+      if (!cur){ prog[key] = {box, seen}; if (v.t) prog[key].t = Number(v.t) || 0; added++; }
+      else {
+        const nb = Math.max(cur.box || 0, box), ns = Math.max(cur.seen || 0, seen);
+        const nt = Math.max(cur.t || 0, Number(v.t) || 0);
+        if (nb !== cur.box || ns !== cur.seen) raised++;
+        cur.box = nb; cur.seen = ns; if (nt) cur.t = nt;
+      }
+    }
+    save();
+    buildDeck(); vSetIdx = 0; buildVDeck(); qList = [];
+    if (!$('browse').hidden) renderBrowse($('q').value);
+    updateStat();
+    dmsg(added || raised ? `Merged: ${added} new, ${raised} updated.` : 'Already up to date — nothing changed.');
+  };
+  r.readAsText(f);
+};
+
+$('rst').onclick = () => {
+  const c = countItems(prog);
+  if (!c.n) return dmsg('Nothing to reset.', true);
+  if (!confirm(`Erase progress for ${c.k} kanji and ${c.w} words? Export first if you want to keep it. This cannot be undone.`)) return;
+  prog = {}; save();
+  buildDeck(); vSetIdx = 0; buildVDeck(); qList = [];
+  if (!$('browse').hidden) renderBrowse($('q').value);
+  updateStat();
+  dmsg('Progress cleared.');
+};
+
+/* ---------- linked file: keep progress in a file you choose ----------
+   File System Access API: Chromium desktop over HTTPS only, and the browser
+   will not re-grant access silently after a reload, so a reconnect click is
+   expected. Everywhere else the Export/Import buttons above are the answer. */
+const FS_OK = typeof window.showSaveFilePicker === 'function' && window.isSecureContext;
+let fh = null, fhDirty = false, fhTimer = null;
+
+const idb = () => new Promise((res, rej) => {
+  const r = indexedDB.open('kanji-fs', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('h');
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+/* Remembering the handle is a convenience: IndexedDB is unavailable on opaque
+   origins and in some private windows, and failing to remember must never stop
+   the link working for this session. */
+const idbPut = async (k, v) => { try { const d = await idb(); return await new Promise((res, rej) => {
+  const t = d.transaction('h', 'readwrite'); t.objectStore('h').put(v, k);
+  t.oncomplete = res; t.onerror = () => rej(t.error); }); } catch(e){ return null; } };
+const idbGet = async k => { try { const d = await idb(); return await new Promise((res, rej) => {
+  const t = d.transaction('h', 'readonly'), q = t.objectStore('h').get(k);
+  q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); } catch(e){ return null; } };
+
+function showLink(state, name){
+  $('dsep').hidden = $('link').hidden = !FS_OK;
+  $('unlink').hidden = $('dfile').hidden = !(FS_OK && state !== 'none');
+  if (!FS_OK) return;
+  $('link').hidden = state !== 'none';
+  if (state === 'none') return;
+  $('dfile').innerHTML = state === 'ok'
+    ? `<i></i>Syncing to <b>${esc(name)}</b>`
+    : `<i class="warn"></i><b>${esc(name)}</b> — click Reconnect`;
+  if (state === 'stale'){ $('link').hidden = false; $('link').textContent = 'Reconnect'; }
+  else $('link').textContent = 'Link a file…';
+}
+
+const payloadNow = () => {
+  const c = countItems(prog);
+  return JSON.stringify({app:'kanji-for-jlpt', version:1, exported:new Date().toISOString(),
+                         counts:{kanji:c.k, words:c.w}, items:prog});
+};
+function mergeItems(items){
+  let added = 0, raised = 0;
+  for (const key in items){
+    const v = items[key];
+    if (!v || typeof v !== 'object') continue;
+    const box = Math.max(0, Math.min(5, Number(v.box) || 0));
+    const seen = Math.max(0, Number(v.seen) || 0);
+    const cur = prog[key];
+    if (!cur){ prog[key] = {box, seen}; if (v.t) prog[key].t = Number(v.t) || 0; added++; }
+    else { const nb = Math.max(cur.box||0, box), ns = Math.max(cur.seen||0, seen);
+           const nt = Math.max(cur.t||0, Number(v.t)||0);
+           if (nb !== cur.box || ns !== cur.seen) raised++;
+           cur.box = nb; cur.seen = ns; if (nt) cur.t = nt; }
+  }
+  return {added, raised};
+}
+function refreshAll(){
+  buildDeck(); vSetIdx = 0; buildVDeck(); qList = [];
+  if (!$('browse').hidden) renderBrowse($('q').value);
+  updateStat();
+}
+async function fhWrite(){
+  if (!fh) return;
+  try { const w = await fh.createWritable(); await w.write(payloadNow()); await w.close(); fhDirty = false; }
+  catch(e){ showLink('stale', fh.name); }
+}
+const fhQueue = () => { if (!fh) return; fhDirty = true;
+  clearTimeout(fhTimer); fhTimer = setTimeout(fhWrite, 1200); };
+document.addEventListener('visibilitychange', () => { if (document.hidden && fhDirty) fhWrite(); });
+window.addEventListener('pagehide', () => { if (fhDirty) fhWrite(); });
+
+async function adoptFile(handle, announce){
+  fh = handle;
+  let merged = {added:0, raised:0};
+  try {
+    const txt = await (await handle.getFile()).text();
+    if (txt.trim()){
+      const data = JSON.parse(txt);
+      if (data && data.items) merged = mergeItems(data.items);
+    }
+  } catch(e){ /* empty or unreadable file: we will simply write ours into it */ }
+  if (merged.added || merged.raised){ save(); refreshAll(); }
+  await fhWrite();
+  showLink('ok', handle.name);
+  if (announce) dmsg(merged.added || merged.raised
+      ? `Linked. Restored ${merged.added} new, ${merged.raised} updated.`
+      : 'Linked — progress now saves to that file automatically.');
+}
+
+$('link').onclick = async () => {
+  try {
+    if (fh){                                   /* reconnect an existing link */
+      if (await fh.requestPermission({mode:'readwrite'}) === 'granted') return adoptFile(fh, true);
+      return dmsg('Permission denied for that file.', true);
+    }
+    const handle = await window.showSaveFilePicker({
+      suggestedName: 'kanji-progress.json',
+      types: [{description:'Kanji progress', accept:{'application/json':['.json']}}]
+    });
+    await idbPut('file', handle);
+    await adoptFile(handle, true);
+  } catch(e){
+    if (!e || e.name === 'AbortError') return;                       /* picker dismissed */
+    dmsg(e.name === 'SecurityError' ? 'This browser blocked file access here.'
+       : 'Could not link that file: ' + (e.message || e.name), true);
+  }
+};
+$('unlink').onclick = async () => {
+  fh = null; clearTimeout(fhTimer); fhDirty = false;
+  try { await idbPut('file', null); } catch(e){}
+  showLink('none'); dmsg('Unlinked. Progress still saves in this browser.');
+};
+
+(async () => {
+  showLink('none');
+  if (!FS_OK) return;
+  const handle = await idbGet('file');
+  if (!handle || typeof handle.queryPermission !== 'function') return;
+  fh = handle;
+  try {
+    const perm = await handle.queryPermission({mode:'readwrite'});
+    if (perm === 'granted') await adoptFile(handle, false);
+    else showLink('stale', handle.name);          /* needs a click; browsers require it */
+  } catch(e){ showLink('stale', handle.name); }
+})();
+
+/* ---------- graded reading ---------- */
+const READ = __READ__;
+let rIdx = 0, rShown = {};
+
+function rpool(){
+  const P = (level === 'all' || level === 'N1*') ? READ : READ.filter(d => d.t === level);
+  return P.length ? P : READ;
+}
+function rfill(){
+  const P = rpool();
+  if (rIdx >= P.length) rIdx = 0;
+  $('rsel').innerHTML = P.map((d,i) => `<option value="${i}">${d.t} · ${d.ti}</option>`).join('');
+}
+function rrender(){
+  const P = rpool();
+  if (rIdx >= P.length) rIdx = 0;
+  const d = P[rIdx];
+  rfill();
+  $('rsel').value = rIdx;
+  $('rinfo').textContent = `${rIdx+1} / ${P.length}`;
+  const paras = d.p.map(row => `<p class="rpara">` + row.map(st =>
+      `<span class="rs"><span class="jp">${rubyRuns(st.r)}</span>`
+    + `<span class="en">${esc(st.e)}</span></span>`).join('') + `</p>`).join('');
+  const qs = d.q.map((q, i) => {
+    const picked = (rShown[d.id] || {})[i];
+    const opts = q.o.map((o, j) => {
+      let cls = 'opt jpopt';
+      if (picked !== undefined){
+        if (j === q.a) cls += ' right';
+        else if (j === picked) cls += ' wrong';
+      }
+      return `<button class="${cls}" data-q="${i}" data-o="${j}"${picked !== undefined ? ' disabled' : ''}>`
+           + `<b>${j+1}</b>${esc(o)}</button>`;
+    }).join('');
+    return `<div class="rq"><h3><b>${i+1}</b>${esc(q.q)}</h3><div class="opts">${opts}</div>`
+         + (picked !== undefined ? `<p class="rwhy">${picked === q.a ? '正解。' : '不正解。'}${esc(q.w)}</p>` : '')
+         + `</div>`;
+  }).join('');
+  $('rstage').innerHTML = `
+    <div class="card"><div class="face">
+      <p class="rtitle">${esc(d.ti)}</p>
+      <p class="rmeta"><span class="rbadge ${d.t}">${d.t}</span>${d.k ? `<span class="rkind">${esc(d.k)}</span> · ` : ''}${d.p.reduce((n,row)=>n+row.reduce((m,st)=>m+st.r.reduce((k,x)=>k+x[0].length,0),0),0)} characters</p>
+      ${paras}
+      ${d.tb ? `<table class="rtab"><thead><tr>` +
+          d.tb.head.map(c => `<th>${c.length ? rubyRuns(c) : ''}</th>`).join('') +
+          `</tr></thead><tbody>` +
+          d.tb.rows.map(r => `<tr>` + r.map((c,i) =>
+            i ? `<td>${rubyRuns(c)}</td>` : `<th scope="row">${rubyRuns(c)}</th>`).join('') + `</tr>`).join('') +
+          `</tbody></table>` : ''}
+      ${qs}
+    </div></div>
+    <div class="nav"><button class="lnk" data-rgo="-1">← Previous</button>
+      <span class="lnk">${d.t}</span>
+      <button class="lnk" data-rgo="1">Next →</button></div>`;
+  $('rstage').querySelectorAll('.opt:not([disabled])').forEach(b => b.onclick = () => {
+    (rShown[d.id] = rShown[d.id] || {})[+b.dataset.q] = +b.dataset.o;
+    try { localStorage.setItem('n2-read', JSON.stringify(rShown)); } catch(e){}
+    rrender();
+  });
+  $('rstage').querySelectorAll('[data-rgo]').forEach(b => b.onclick = () => rmove(+b.dataset.rgo));
+  $('rstage').querySelectorAll('.rs').forEach(el => el.addEventListener('click', ev => {
+    if (ROOT.getAttribute('data-trans') !== 'tap') return;
+    if (ev.target.closest('ruby') && ROOT.getAttribute('data-furi') === 'hover') return;
+    el.classList.toggle('open');
+  }));
+  hookRuby($('rstage'));
+}
+function rmove(d){
+  const n = rpool().length;
+  rIdx = (rIdx + d + n) % n;
+  try { localStorage.setItem('n2-readi', rIdx); } catch(e){}
+  rrender(); window.scrollTo({top:0, behavior:'smooth'});
+}
+$('rsel').onchange = e => { rIdx = +e.target.value; rrender(); };
+$('rprev').onclick = () => rmove(-1);
+$('rnext').onclick = () => rmove(1);
+try { rShown = JSON.parse(localStorage.getItem('n2-read') || '{}') || {}; } catch(e){ rShown = {}; }
+try { const i = +localStorage.getItem('n2-readi'); if (i >= 0 && i < READ.length) rIdx = i; } catch(e){}
+rfill();
+
+/* ---------- tabs ---------- */
+const VIEWS = ['study','vocab','quiz','read','browse'];
+let view = 'study';
+function show(v){
+  view = v;
+  VIEWS.forEach(x => { $(x).hidden = x !== v; $('t-'+x).setAttribute('aria-selected', String(x === v)); });
+  if (v === 'browse') renderBrowse($('q').value);
+  if (v === 'vocab' && !vorder.length) buildVDeck();
+  if (v === 'quiz'  && !qList.length)  buildQuiz();
+  if (v === 'read') rrender();
+  updateStat();
+}
+$('t-study').onclick  = () => show('study');
+$('t-vocab').onclick  = () => show('vocab');
+$('t-quiz').onclick   = () => show('quiz');
+$('t-read').onclick   = () => show('read');
+$('t-browse').onclick = () => show('browse');
+
+/* the Words filter changes which words are in the vocabulary deck, so rebuild it */
+$('wl').addEventListener('click', () => {
+  if (vorder.length){ vSetIdx = 0; buildVDeck(); }
+});
+
+/* ---------- home / back to top ---------- */
+function goHome(){
+  const q = $('q'); if (q) q.value = '';
+  browseK = null;
+  show('study');                                   /* keeps your place in the deck */
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+$('home').onclick = goHome;
+$('home2').onclick = goHome;
+
+const topBtn = $('toTop');
+topBtn.onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+const syncTop = () => topBtn.classList.toggle('show', window.scrollY > 520);
+window.addEventListener('scroll', syncTop, {passive:true});
+syncTop();
+
+/* ---------- keys ---------- */
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea,select')) return;
+  const k = e.key.toLowerCase();
+  if (k === 'f'){ cycleFuri(); return; }
+  if (k === 'e'){ toggleTrans(); return; }
+  if (k === 't'){ cycleTheme(); return; }
+  if (view === 'quiz'){
+    if (qAnswered === null && '1234'.includes(k)){
+      const b = $('qstage').querySelector(`.opt[data-o="${+k - 1}"]`); if (b) b.click();
+    } else if (e.code === 'Space' || e.key === 'Enter'){
+      e.preventDefault(); const n = $('qnext'); if (n) n.click();
+    }
+    return;
+  }
+  if (view === 'vocab'){
+    if (e.code === 'Space'){ e.preventDefault(); if (!vflip && !vdone){ vflip = true; vrender(); } }
+    else if (k === '1' && vflip && !vdone) vmark(0);
+    else if (k === '2' && vflip && !vdone) vmark(1);
+    else if (e.key === 'ArrowRight') vmove(1);
+    else if (e.key === 'ArrowLeft') vmove(-1);
+    return;
+  }
+  if ($('study').hidden){          /* browse mode */
+    if (browseK){
+      if (k === '1'){ browseMark(0); return; }
+      if (k === '2'){ browseMark(1); return; }
+      if (e.key === 'Escape'){ renderBrowse($('q').value); return; }
+      if (e.key === 'ArrowRight'){ const b = $('bnext'); if (b) b.click(); return; }
+    }
+    return;
+  }
+  if (e.code === 'Space'){ e.preventDefault(); if (!flipped && !finished){ flipped = true; render(); } }
+  else if (k === '1' && flipped && !finished) mark(0);
+  else if (k === '2' && flipped && !finished) mark(1);
+  else if (e.key === 'ArrowRight') move(1);
+  else if (e.key === 'ArrowLeft') move(-1);
+});
+
+buildSets();
+buildDeck();
+</script>

@@ -2,7 +2,8 @@ import json, re, pathlib
 tpl  = pathlib.Path('n2_site_template.html').read_text(encoding='utf-8')
 data = json.dumps(json.load(open('deck_packed.json',encoding='utf-8')), ensure_ascii=False, separators=(',',':'))
 read = json.dumps(json.load(open('reading_packed.json',encoding='utf-8')), ensure_ascii=False, separators=(',',':'))
-body = tpl.replace('__DATA__', data).replace('__READ__', read)
+glos = json.dumps(json.load(open('gloss_packed.json',encoding='utf-8')), ensure_ascii=False, separators=(',',':'))
+body = tpl.replace('__DATA__', data).replace('__READ__', read).replace('__GLOSS__', glos)
 pathlib.Path('n2_kanji_site.html').write_text(body, encoding='utf-8')
 
 title='Kanji for JLPT'

@@ -11,6 +11,9 @@ from reading_n2e  import PASSAGES as _P5
 from reading_n2f  import PASSAGES as _P6
 from reading_sent_en import SENT_EN
 from furigana import full_furigana
+from gloss import Glossary
+_G = Glossary()
+full_furigana = _G.runs
 PASSAGES = _P1 + _P2 + _P3 + _P4 + _P5 + _P6
 KAN = re.compile(r'[一-鿿々]')
 
@@ -38,7 +41,7 @@ for p in PASSAGES:
         row = []
         for s in sents:
             runs = full_furigana(s)
-            if ''.join(t for t, _ in runs) != s:
+            if ''.join(r[0] for r in runs) != s:
                 problems.append(f"{p['id']}: furigana changed the text")
             row.append({"r": runs, "e": en[k]}); k += 1
         packed.append(row)
@@ -52,11 +55,17 @@ for p in PASSAGES:
                 "q": [{"q": q['q'], "o": q['opts'], "a": q['ans'], "w": q['why']} for q in p['qs']]})
 
 json.dump(out, open('reading_packed.json','w',encoding='utf-8'), ensure_ascii=False, separators=(',',':'))
+json.dump(_G.entries, open('gloss_packed.json','w',encoding='utf-8'), ensure_ascii=False, separators=(',',':'))
 ns = sum(len(r) for x in out for r in x['p'])
 blank = sum(1 for x in out for r in x['p'] for s in r if not s['e'].strip())
 print(f'passages {len(out)} | sentences {ns} | questions {sum(len(x["q"]) for x in out)} | '
       f'KB {round(len(json.dumps(out,ensure_ascii=False).encode())/1024,1)}')
+glossed = sum(1 for x in out for r in x['p'] for st in r for run in st['r'] if len(run) == 3)
+ruby = sum(1 for x in out for r in x['p'] for st in r for run in st['r'] if run[1])
 print(f'sentences without English: {blank}')
+print(f'glossary {len(_G.entries)} words | ruby runs {ruby} | with a meaning {glossed} '
+      f'({round(100*glossed/max(ruby,1))}%) | unglossed lemmas {len(_G.misses)}')
+if _G.misses: print('  no gloss for:', ' '.join(sorted(_G.misses)[:40]))
 print(f'PROBLEMS {len(problems)}')
 for q in problems: print('  ✗', q)
 sys.exit(1 if problems else 0)
