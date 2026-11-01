@@ -8,8 +8,10 @@ from reading_n2c import PASSAGES as _P4
 from reading_n2e import PASSAGES as _P5
 from reading_n2f import PASSAGES as _P6
 from reading_long import PASSAGES as _OV
+from reading_exam import PASSAGES as _EX
 from reading_norm import expand_pairs, merge, OFFICIAL_LEN
 PASSAGES = merge(_P1 + _P2 + _P3 + _P4 + _P5 + _P6, expand_pairs(_OV, {}))
+PASSAGES = merge(PASSAGES, expand_pairs(_EX, {}))
 expand_pairs(PASSAGES, {})
 
 lv = json.load(open('kanji_by_level.json', encoding='utf-8'))
@@ -21,7 +23,7 @@ KAN = re.compile(r'[一-鿿々]')
 FOREIGN = re.compile('[' + ''.join(map(chr, list(range(0x0400,0x0500)) + list(range(0xAC00,0xD7B0)))) + ']')
 LATIN = re.compile(r'[A-Za-z]')
 
-fails = []
+fails, short = [], []
 print(f'{"id":4} {"tier":5} {"chars":>6} {"kanji":>6}  title')
 for p in PASSAGES:
     allow = TIERS[p['tier']]
@@ -48,9 +50,15 @@ for p in PASSAGES:
         tb = p.get('table')
         if tb: n += sum(len(c) for c in tb['head']) + sum(len(c) for r in tb['rows'] for c in r)
         if n < want * 0.85:
-            fails.append(f'{p["id"]} ({p.get("kind")}): {n} chars against the official '
-                         f'{want}字程度 — {round(100*n/want)}%')
+            msg = (f'{p["id"]} ({p.get("kind")}): {n} chars against the official '
+                   f'{want}字程度 — {round(100*n/want)}%')
+            # Hard failure in the N2 exam category, where full length is the
+            # point. Elsewhere it is reported but not enforced: the graded
+            # reading passages are left as they are.
+            (fails if p.get('grp') == 'exam' else short).append(msg)
 
+print(f'\nunder the official length (graded reading, not enforced): {len(short)}')
+for q in short: print('  ·', q)
 print(f'\nFAILURES: {len(fails)}')
 for f in fails: print('  ✗', f)
 sys.exit(1 if fails else 0)

@@ -453,6 +453,10 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
 
   <div id="read" hidden>
     <div class="deckbar">
+      <div class="seg" id="rset" aria-label="Which passages">
+        <button data-v="read" aria-pressed="true" title="Graded reading passages, N5 to N2">Reading</button>
+        <button data-v="exam" aria-pressed="false" title="A full N2 読解 paper: 問題10 to 問題14, every passage at the official length">N2 exam <em style="font-style:normal;font-family:var(--jp)">試験</em></button>
+      </div>
       <select id="rsel" aria-label="Choose a passage"></select>
       <button class="chip" id="rprev">←</button>
       <button class="chip" id="rnext">→</button>
@@ -466,6 +470,12 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
       the questions, which use the same formats as the exam's 読解 section.
       Turn <b>Meaning</b> on and tapping a word shows its dictionary form and English as well as
       its reading, so you can look something up without leaving the passage.
+      <br><br>
+      <b>N2 exam</b> is a separate category: one complete 読解 paper, 問題10 to 問題14, with
+      twenty questions — the same count as the real 52–71. Every passage there is held to the
+      length the exam itself uses (jlpt.jp's guideline: 短文 200字, 中文 500字, 統合理解 600字,
+      長文 900字, 情報検索 700字), because reading a page and reading half a page are not the
+      same exercise. The level menu doesn't apply to it; it is N2 throughout.
     </div>
   </div>
 
@@ -522,7 +532,7 @@ const box = k => (prog[k] && prog[k].box) || 0;
 /* ---------- settings ---------- */
 const ROOT = document.documentElement;
 const SEGS = {furi:{attr:'data-furi', def:'on'}, trans:{attr:'data-trans', def:'on'},
-              gloss:{attr:'data-gloss', def:'off'},
+              gloss:{attr:'data-gloss', def:'off'}, rset:{attr:'data-rset', def:'read'},
               wl:{attr:'data-wl', def:'all'},
               size:{attr:'data-size', def:'auto'}, theme:{attr:'data-theme', def:'auto'}};
 
@@ -1400,14 +1410,20 @@ $('unlink').onclick = async () => {
 const READ = __READ__;
 let rIdx = 0, rShown = {};
 
+const rsetNow = () => ROOT.getAttribute('data-rset') || 'read';
 function rpool(){
-  const P = (level === 'all' || level === 'N1*') ? READ : READ.filter(d => d.t === level);
-  return P.length ? P : READ;
+  /* The exam paper is its own category: it is kept out of the graded reading
+     list, and the level menu does not apply to it -- it is N2 by definition. */
+  if (rsetNow() === 'exam') return READ.filter(d => d.g === 'exam');
+  const R = READ.filter(d => d.g !== 'exam');
+  const P = (level === 'all' || level === 'N1*') ? R : R.filter(d => d.t === level);
+  return P.length ? P : R;
 }
 function rfill(){
   const P = rpool();
   if (rIdx >= P.length) rIdx = 0;
-  $('rsel').innerHTML = P.map((d,i) => `<option value="${i}">${d.t} · ${d.ti}</option>`).join('');
+  $('rsel').innerHTML = P.map((d,i) =>
+    `<option value="${i}">${d.g === 'exam' ? '問題' + d.mn : d.t} · ${d.ti}</option>`).join('');
 }
 function rrender(){
   const P = rpool();
@@ -1466,14 +1482,27 @@ function rrender(){
 function rmove(d){
   const n = rpool().length;
   rIdx = (rIdx + d + n) % n;
-  try { localStorage.setItem('n2-readi', rIdx); } catch(e){}
+  try { localStorage.setItem('n2-readi-' + rsetNow(), rIdx); } catch(e){}
   rrender(); window.scrollTo({top:0, behavior:'smooth'});
 }
 $('rsel').onchange = e => { rIdx = +e.target.value; rrender(); };
 $('rprev').onclick = () => rmove(-1);
 $('rnext').onclick = () => rmove(1);
 try { rShown = JSON.parse(localStorage.getItem('n2-read') || '{}') || {}; } catch(e){ rShown = {}; }
-try { const i = +localStorage.getItem('n2-readi'); if (i >= 0 && i < READ.length) rIdx = i; } catch(e){}
+const rrestore = () => {
+  rIdx = 0;
+  try {
+    const i = +localStorage.getItem('n2-readi-' + rsetNow());
+    if (i >= 0 && i < rpool().length) rIdx = i;
+  } catch(e){}
+};
+/* Each category keeps its own place, so switching does not land you
+   mid-paper or lose where you were in the reading. */
+$('rset').addEventListener('click', e => {
+  if (!e.target.closest('button')) return;
+  rrestore(); rfill(); if (!$('read').hidden) rrender();
+});
+rrestore();
 rfill();
 
 /* ---------- tabs ---------- */
