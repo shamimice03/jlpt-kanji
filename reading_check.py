@@ -9,9 +9,11 @@ from reading_n2e import PASSAGES as _P5
 from reading_n2f import PASSAGES as _P6
 from reading_long import PASSAGES as _OV
 from reading_exam import PASSAGES as _EX
+from reading_exam2 import PASSAGES as _EX2
 from reading_norm import expand_pairs, merge, OFFICIAL_LEN
 PASSAGES = merge(_P1 + _P2 + _P3 + _P4 + _P5 + _P6, expand_pairs(_OV, {}))
 PASSAGES = merge(PASSAGES, expand_pairs(_EX, {}))
+PASSAGES = merge(PASSAGES, expand_pairs(_EX2, {}))
 expand_pairs(PASSAGES, {})
 
 lv = json.load(open('kanji_by_level.json', encoding='utf-8'))
@@ -20,20 +22,26 @@ TIERS = {'N5': set(lv['N5']),
          'N3': set(lv['N5']) | set(lv['N4']) | set(lv['N3']),
          'N2': set(lv['N5']) | set(lv['N4']) | set(lv['N3']) | set(lv['N2'])}
 KAN = re.compile(r'[一-鿿々]')
+# An exam paper written from a test's own kanji is checked against that
+# inventory instead of a JLPT tier: any level is allowed, but only the
+# characters that actually appear on the source test.
+ALLOW_SETS = {'p32': set(json.load(open('page32_kanji.json', encoding='utf-8')))}
 FOREIGN = re.compile('[' + ''.join(map(chr, list(range(0x0400,0x0500)) + list(range(0xAC00,0xD7B0)))) + ']')
 LATIN = re.compile(r'[A-Za-z]')
 
 fails, short = [], []
 print(f'{"id":4} {"tier":5} {"chars":>6} {"kanji":>6}  title')
 for p in PASSAGES:
-    allow = TIERS[p['tier']]
+    allow = ALLOW_SETS[p['allow']] if p.get('allow') else TIERS[p['tier']]
     texts = [p['body']] + [q['q'] for q in p['qs']] + [o for q in p['qs'] for o in q['opts']]
     body_k = set(KAN.findall(p['body']))
     print(f'{p["id"]:4} {p["tier"]:5} {len(p["body"]):6} {len(body_k):6}  {p["title"]}')
     for t in texts:
         for k in set(KAN.findall(t)):
             if k not in allow:
-                fails.append(f'{p["id"]} ({p["tier"]}): kanji 「{k}」 is above tier  … {t[:30]}')
+                fails.append(f'{p["id"]}: kanji 「{k}」 is '
+                             + (f'not on the source test' if p.get('allow') else f'above {p["tier"]}')
+                             + f'  … {t[:30]}')
         if FOREIGN.search(t): fails.append(f'{p["id"]}: FOREIGN SCRIPT in: {t[:40]}')
         if LATIN.search(t):   fails.append(f'{p["id"]}: LATIN LETTERS in: {t[:40]}')
     if not (0 <= p['qs'][0]['ans'] < 4): fails.append(f'{p["id"]}: bad answer index')

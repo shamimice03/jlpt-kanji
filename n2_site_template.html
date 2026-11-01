@@ -237,6 +237,9 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
 .dfile i.warn{background:#D9A441}
 .dnote{font-size:0.75rem;color:var(--faint);line-height:1.7;margin:8px 0 0}
 
+/* the passage menu shrinks rather than pushing the row off a narrow screen */
+#read .deckbar select{min-width:0;flex:1 1 12ch;max-width:100%}
+
 /* word meaning bubble (Meaning: On) */
 #gtip{position:fixed;z-index:50;max-width:min(300px,calc(100vw - 16px));
   background:var(--surface);border:1px solid var(--line);border-radius:10px;
@@ -464,8 +467,8 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
     </div>
     <div id="rstage"></div>
     <div class="note">
-      <b>Graded reading.</b> Each passage uses only kanji at or below its level — checked
-      automatically, so an N3 passage can never slip in an N2 character. Furigana and the English
+      <b>Graded reading.</b> In this category each passage uses only kanji at or below its level —
+      checked automatically, so an N3 passage can never slip in an N2 character. Furigana and the English
       translation follow the controls above; hide both and read it cold, then check yourself with
       the questions, which use the same formats as the exam's 読解 section.
       Turn <b>Meaning</b> on and tapping a word shows its dictionary form and English as well as
@@ -475,7 +478,15 @@ select:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline
       twenty questions — the same count as the real 52–71. Every passage there is held to the
       length the exam itself uses (jlpt.jp's guideline: 短文 200字, 中文 500字, 統合理解 600字,
       長文 900字, 情報検索 700字), because reading a page and reading half a page are not the
-      same exercise. The level menu doesn't apply to it; it is N2 throughout.
+      same exercise. The level menu doesn't apply to it; it is N2 throughout, and there is one
+      paper so far per 第N回 in the menu.
+      <br><br>
+      <b>第2回 follows a real paper's kanji instead of a level.</b> It is original text, but every
+      single character in it is checked against the 610 distinct kanji used in one actual N2
+      reading paper — so characters well above N2 appear (丘 宮 崩 鑑 粧 膨 遥 among them, 96 in
+      all), while a kanji that paper never uses cannot get in. The furigana covers the readings.
+      Treat it as the harder of the two: closer to what the exam actually puts in front of you,
+      and deliberately not level-capped.
     </div>
   </div>
 
@@ -1422,8 +1433,22 @@ function rpool(){
 function rfill(){
   const P = rpool();
   if (rIdx >= P.length) rIdx = 0;
-  $('rsel').innerHTML = P.map((d,i) =>
-    `<option value="${i}">${d.g === 'exam' ? '問題' + d.mn : d.t} · ${d.ti}</option>`).join('');
+  if (rsetNow() === 'exam'){
+    /* grouped by paper, so a 問題10 of one paper is never mistaken for another's */
+    let html = '', last = null;
+    P.forEach((d,i) => {
+      if (d.pn !== last){
+        if (last !== null) html += '</optgroup>';
+        html += `<optgroup label="第${d.pn}回">`;
+        last = d.pn;
+      }
+      html += `<option value="${i}">問題${d.mn} · ${esc(d.ti)}</option>`;
+    });
+    if (last !== null) html += '</optgroup>';
+    $('rsel').innerHTML = html;
+  } else {
+    $('rsel').innerHTML = P.map((d,i) => `<option value="${i}">${d.t} · ${esc(d.ti)}</option>`).join('');
+  }
 }
 function rrender(){
   const P = rpool();
@@ -1453,7 +1478,7 @@ function rrender(){
   $('rstage').innerHTML = `
     <div class="card"><div class="face">
       <p class="rtitle">${esc(d.ti)}</p>
-      <p class="rmeta"><span class="rbadge ${d.t}">${d.t}</span>${d.k ? `<span class="rkind">${esc(d.k)}</span> · ` : ''}${d.p.reduce((n,row)=>n+row.reduce((m,st)=>m+st.r.reduce((k,x)=>k+x[0].length,0),0),0)} characters</p>
+      <p class="rmeta"><span class="rbadge ${d.t}">${d.t}</span>${d.g === 'exam' ? `<span class="rkind">第${d.pn}回 問題${d.mn}・${esc(d.k)}</span> · ` : d.k ? `<span class="rkind">${esc(d.k)}</span> · ` : ''}${d.p.reduce((n,row)=>n+row.reduce((m,st)=>m+st.r.reduce((k,x)=>k+x[0].length,0),0),0)} characters</p>
       ${paras}
       ${d.tb ? `<table class="rtab"><thead><tr>` +
           d.tb.head.map(c => `<th>${c.length ? rubyRuns(c) : ''}</th>`).join('') +

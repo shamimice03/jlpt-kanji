@@ -11,6 +11,7 @@ from reading_n2e  import PASSAGES as _P5
 from reading_n2f  import PASSAGES as _P6
 from reading_long import PASSAGES as _OV
 from reading_exam import PASSAGES as _EX
+from reading_exam2 import PASSAGES as _EX2
 from reading_norm import expand_pairs, merge
 from reading_sent_en import SENT_EN
 from furigana import full_furigana
@@ -19,6 +20,7 @@ _G = Glossary()
 full_furigana = _G.runs
 PASSAGES = merge(_P1 + _P2 + _P3 + _P4 + _P5 + _P6, expand_pairs(_OV, SENT_EN))
 PASSAGES = merge(PASSAGES, expand_pairs(_EX, SENT_EN))
+PASSAGES = merge(PASSAGES, expand_pairs(_EX2, SENT_EN))
 expand_pairs(PASSAGES, SENT_EN)
 KAN = re.compile(r'[一-鿿々]')
 
@@ -60,7 +62,7 @@ for p in PASSAGES:
         tbl = {"head": [full_furigana(c) if c else [] for c in tb['head']],
                "rows": [[full_furigana(c) for c in row] for row in tb['rows']]}
     out.append({"id": p['id'], "t": p['tier'], "ti": p['title'], "k": p.get('kind',''),
-                "g": p.get('grp'), "mn": p.get('mn'),
+                "g": p.get('grp'), "mn": p.get('mn'), "pn": p.get('paper'),
                 "p": packed, "en": p['en'], "tb": tbl,
                 "q": [{"q": q['q'], "o": q['opts'], "a": q['ans'], "w": q['why']} for q in p['qs']]})
 
