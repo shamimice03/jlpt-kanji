@@ -7,7 +7,10 @@ from reading_n2b import PASSAGES as _P3
 from reading_n2c import PASSAGES as _P4
 from reading_n2e import PASSAGES as _P5
 from reading_n2f import PASSAGES as _P6
-PASSAGES = _P1 + _P2 + _P3 + _P4 + _P5 + _P6
+from reading_long import PASSAGES as _OV
+from reading_norm import expand_pairs, merge, OFFICIAL_LEN
+PASSAGES = merge(_P1 + _P2 + _P3 + _P4 + _P5 + _P6, expand_pairs(_OV, {}))
+expand_pairs(PASSAGES, {})
 
 lv = json.load(open('kanji_by_level.json', encoding='utf-8'))
 TIERS = {'N5': set(lv['N5']),
@@ -37,6 +40,16 @@ for p in PASSAGES:
         if len(set(q['opts'])) != len(q['opts']): fails.append(f'{p["id"]}: duplicate options')
         if not q.get('why','').strip(): fails.append(f'{p["id"]}: no explanation')
     if not p.get('en','').strip(): fails.append(f'{p["id"]}: no translation')
+    # The exam's own lengths (jlpt.jp/guideline/pdf/n2.pdf). A passage far
+    # shorter than its type is not the exercise it claims to be.
+    want = OFFICIAL_LEN.get(p.get('kind'))
+    if want and p['tier'] == 'N2':
+        n = len(re.sub(r'\s', '', p['body']))
+        tb = p.get('table')
+        if tb: n += sum(len(c) for c in tb['head']) + sum(len(c) for r in tb['rows'] for c in r)
+        if n < want * 0.85:
+            fails.append(f'{p["id"]} ({p.get("kind")}): {n} chars against the official '
+                         f'{want}字程度 — {round(100*n/want)}%')
 
 print(f'\nFAILURES: {len(fails)}')
 for f in fails: print('  ✗', f)

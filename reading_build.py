@@ -9,12 +9,15 @@ from reading_n2b  import PASSAGES as _P3
 from reading_n2c  import PASSAGES as _P4
 from reading_n2e  import PASSAGES as _P5
 from reading_n2f  import PASSAGES as _P6
+from reading_long import PASSAGES as _OV
+from reading_norm import expand_pairs, merge
 from reading_sent_en import SENT_EN
 from furigana import full_furigana
 from gloss import Glossary
 _G = Glossary()
 full_furigana = _G.runs
-PASSAGES = _P1 + _P2 + _P3 + _P4 + _P5 + _P6
+PASSAGES = merge(_P1 + _P2 + _P3 + _P4 + _P5 + _P6, expand_pairs(_OV, SENT_EN))
+expand_pairs(PASSAGES, SENT_EN)
 KAN = re.compile(r'[一-鿿々]')
 
 def split_jp(line):
@@ -32,6 +35,10 @@ for p in PASSAGES:
         if not line: continue
         sents = split_jp(line)
         paras.append(sents); flat.extend(sents)
+    if p.get('pairs') and [len(x) for x in paras] != [len(x) for x in p['pairs']]:
+        problems.append(f"{p['id']}: pairs give {[len(x) for x in p['pairs']]} sentences "
+                        f"per paragraph but the splitter sees {[len(x) for x in paras]} "
+                        f"-- a pair holds more than one sentence")
     en = SENT_EN.get(p['id']) or split_en(p['en'])
     if len(en) != len(flat):
         problems.append(f"{p['id']}: {len(flat)} Japanese sentences but {len(en)} English")
